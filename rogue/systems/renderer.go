@@ -31,6 +31,12 @@ func (r *Renderer) ShouldTrack(object entities.GameObject) bool {
 
 // Update updates the system state.
 func (r *Renderer) Update(objects map[uint64]entities.GameObject) error {
+
+	// TODO: Next iteration of the render process.
+	// Phase 1 - Draw map changes (Taking viewport into account?)
+	// Phase 2 - Draw all objects.
+	// Phase 3 - Commit to screen
+
 	// Update the canvas for all drawable entities.
 	for _, obj := range objects {
 		drawable := obj.GetComponent(components.DrawableName).(components.Drawable)
