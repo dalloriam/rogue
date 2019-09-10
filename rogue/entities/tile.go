@@ -8,21 +8,21 @@ import (
 
 // Tile represents a drawn tile.
 type Tile struct {
-	*GameObject
+	*BaseObject
 }
 
 // NewTile returns a new tile instance
-func NewTile(char rune, fgColor color.Color, bgColor color.Color) *Tile {
+func NewTile(posX, posY uint64, char rune, fgColor color.Color, bgColor color.Color) *Tile {
 	return &Tile{
-		GameObject: NewObject(
+		BaseObject: NewObject(
 			components.Drawable{
 				Char:    char,
 				FgColor: fgColor,
 				BgColor: bgColor,
 			},
 			components.Position{
-				X: 0,
-				Y: 0,
+				X: posX,
+				Y: posY,
 			},
 		),
 	}

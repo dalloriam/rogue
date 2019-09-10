@@ -6,8 +6,8 @@ const (
 
 // Position represents a X, Y position in the window
 type Position struct {
-	X int64
-	Y int64
+	X uint64
+	Y uint64
 }
 
 func (p Position) Name() string {
