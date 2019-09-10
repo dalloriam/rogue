@@ -2,7 +2,6 @@ package rogue
 
 import (
 	"sort"
-	"time"
 
 	"github.com/dalloriam/rogue/rogue/systems"
 
@@ -15,6 +14,9 @@ type World struct {
 	systems          []*systems.GameSystem
 
 	objects map[uint64]entities.GameObject
+
+	// currentMap represents the currently loaded map in its entirety -- NOT the map sections displayed in the viewport.
+	currentMap Map
 }
 
 func NewWorld() *World {
@@ -22,6 +24,10 @@ func NewWorld() *World {
 		systemPriorities: make(map[*systems.GameSystem]int),
 		objects:          make(map[uint64]entities.GameObject),
 	}
+}
+
+func (w *World) LoadMap(m Map) {
+	w.currentMap = m
 }
 
 func (w *World) AddObject(object entities.GameObject) {
@@ -54,7 +60,6 @@ func (w *World) Tick() error {
 			return err
 		}
 	}
-	time.Sleep(10 * time.Second)
 
 	return nil
 }

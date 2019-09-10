@@ -12,18 +12,26 @@ import (
 )
 
 type GridRenderOptions struct {
+	// Tiling-related settings.
 	FontFacePath string
 	FontSize     int
+	TileSizeX    uint64
+	TileSizeY    uint64
 
-	TileSizeX uint64
-	TileSizeY uint64
+	// Window-related settings.
+	WindowTitle string
+	WindowSizeX uint64
+	WindowSizeY uint64
 
-	Window *pixelgl.Window
+	// Advanced Settings
+	SmoothDrawing bool
+	VSync         bool
 }
 
 // GridRenderer abstracts a pixel-powered grid renderer.
 type GridRenderer struct {
-	opt GridRenderOptions
+	opt    GridRenderOptions
+	window *pixelgl.Window
 
 	imd        *imdraw.IMDraw
 	textDrawer *text.Text
@@ -31,10 +39,24 @@ type GridRenderer struct {
 
 // NewRenderer initializes and returns a new pixel renderer in the specified window.
 func NewRenderer(opt GridRenderOptions) (*GridRenderer, error) {
+	// Pixel window setup.
+	cfg := pixelgl.WindowConfig{
+		Title:  opt.WindowTitle,
+		Bounds: pixel.R(0, 0, float64(opt.WindowSizeX), float64(opt.WindowSizeY)),
+		VSync:  opt.VSync,
+	}
+
+	win, err := pixelgl.NewWindow(cfg)
+	if err != nil {
+		panic(err)
+	}
+	win.SetSmooth(opt.SmoothDrawing)
+
 	// Create the grid renderer.
 	r := GridRenderer{
-		opt: opt,
-		imd: imdraw.New(opt.Window),
+		opt:    opt,
+		imd:    imdraw.New(win),
+		window: win,
 	}
 
 	// Load the main font.
@@ -79,9 +101,13 @@ func (r *GridRenderer) DrawTile(x, y uint64, char rune, fgColor, bgColor color.C
 }
 
 func (r *GridRenderer) Draw() {
-	r.imd.Draw(r.opt.Window)
-	r.textDrawer.Draw(r.opt.Window, pixel.IM)
-	r.opt.Window.Update()
-	r.opt.Window.Clear(pixel.RGB(0, 0, 0))
+	r.imd.Draw(r.window)
+	r.textDrawer.Draw(r.window, pixel.IM)
+	r.window.Update()
+	r.window.Clear(pixel.RGB(0, 0, 0))
 	r.textDrawer.Clear()
+}
+
+func (r *GridRenderer) Running() bool {
+	return !r.window.Closed()
 }

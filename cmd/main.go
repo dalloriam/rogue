@@ -10,23 +10,10 @@ import (
 
 	"github.com/dalloriam/rogue/backends/roguepixel"
 
-	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 )
 
 func pixelRun() {
-	// Pixel window setup.
-	cfg := pixelgl.WindowConfig{
-		Title:  "Rogue",
-		Bounds: pixel.R(0, 0, 1024, 768),
-		VSync:  true,
-	}
-
-	win, err := pixelgl.NewWindow(cfg)
-	if err != nil {
-		panic(err)
-	}
-	win.SetSmooth(true)
 
 	// Rogue renderer setup.
 	r, err := roguepixel.NewRenderer(roguepixel.GridRenderOptions{
@@ -34,7 +21,13 @@ func pixelRun() {
 		FontSize:     22,
 		TileSizeX:    30,
 		TileSizeY:    30,
-		Window:       win,
+
+		WindowTitle: "Rogue Demo",
+		WindowSizeX: 1024,
+		WindowSizeY: 768,
+
+		SmoothDrawing: true,
+		VSync:         true,
 	})
 	if err != nil {
 		panic(err)
@@ -56,7 +49,7 @@ func pixelRun() {
 		}
 	}
 
-	for !win.Closed() {
+	for r.Running() {
 		if err := world.Tick(); err != nil {
 			panic(err)
 		}
