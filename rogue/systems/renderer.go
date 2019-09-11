@@ -1,16 +1,16 @@
 package systems
 
 import (
-	"image/color"
-
 	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/entities"
+	"image/color"
 )
 
 // RenderingBackend abstracts a rendering engine.
 type RenderingEngine interface {
-	DrawTile(x, y uint64, char rune, fgColor, bgColor color.Color)
+	Clear()
 	Draw()
+	DrawTile(x, y uint64, char rune, fgColor, bgColor color.Color)
 }
 
 // A Renderer renders components.
@@ -31,6 +31,8 @@ func (r *Renderer) ShouldTrack(object entities.GameObject) bool {
 
 // Update updates the system state.
 func (r *Renderer) Update(objects map[uint64]entities.GameObject) error {
+
+	r.engine.Clear()
 
 	// TODO: Next iteration of the render process.
 	// Phase 1 - Draw map changes (Taking viewport into account?)

@@ -100,12 +100,18 @@ func (r *GridRenderer) DrawTile(x, y uint64, char rune, fgColor, bgColor color.C
 	}
 }
 
+func (r *GridRenderer) Clear() {
+	// TODO: This supposes that the whole screen is redrawn each frame. This is far from optimal & will need to be
+	//  improved at a later time.
+	r.imd.Clear()
+	r.textDrawer.Clear()
+	r.window.Clear(pixel.RGB(0, 0, 0))  // TODO: Make configurable
+}
+
 func (r *GridRenderer) Draw() {
 	r.imd.Draw(r.window)
 	r.textDrawer.Draw(r.window, pixel.IM)
 	r.window.Update()
-	r.window.Clear(pixel.RGB(0, 0, 0))
-	r.textDrawer.Clear()
 }
 
 func (r *GridRenderer) Running() bool {
