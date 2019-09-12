@@ -22,8 +22,6 @@ func pixelRun() {
 	r, err := roguepixel.NewRenderer(roguepixel.GridRenderOptions{
 		FontFacePath: "data/font.ttf",
 		FontSize:     22,
-		TileSizeX:    30,
-		TileSizeY:    30,
 
 		WindowTitle: "Rogue Demo",
 		WindowSizeX: 1024,
@@ -37,7 +35,10 @@ func pixelRun() {
 	}
 
 	// Creating system from rogue renderer.
-	renderingSystem, err := systems.NewRenderer(r)
+	renderingSystem, err := systems.NewRenderer(r, systems.RendererOptions{
+		TileSizeX: 30,
+		TileSizeY: 30,
+	})
 	if err != nil {
 		panic(err)
 	}

@@ -12,6 +12,9 @@ import (
 )
 
 type GridRenderOptions struct {
+	// Font settings.
+	FontFacePath string
+	FontSize     int
 
 	// Window-related settings.
 	WindowTitle string
@@ -67,7 +70,7 @@ func NewRenderer(opt GridRenderOptions) (*GridRenderer, error) {
 }
 
 func (r *GridRenderer) getFontAtlas() (*text.Atlas, error) {
-	face, err := util.LoadTTF(r.opt.FontFacePath, 22)
+	face, err := util.LoadTTF(r.opt.FontFacePath, float64(r.opt.FontSize))
 	if err != nil {
 		return nil, err
 	}
@@ -85,25 +88,15 @@ func (r *GridRenderer) Rectangle(startX, startY, endX, endY uint64, bgColor colo
 	r.imd.Rectangle(0)
 }
 
-// DrawTile draws a tile.
-func (r *GridRenderer) DrawTile(x, y uint64, char rune, fgColor, bgColor color.Color) {
-	r.imd.Color = bgColor
-
-	origin := pixel.V(float64(x*r.opt.TileSizeX), float64(y*r.opt.TileSizeY))
-	r.imd.Push(origin)
-
-	dst := pixel.V(origin.X+float64(r.opt.TileSizeX), origin.Y+float64(r.opt.TileSizeY))
-	r.imd.Push(dst)
-	r.imd.Rectangle(0)
-
-	line := string([]rune{char})
-	r.textDrawer.Dot = pixel.V(origin.X, origin.Y)
-	r.textDrawer.Dot.X += r.textDrawer.BoundsOf(line).W() * 0.8 / 2
-	r.textDrawer.Dot.Y += r.textDrawer.BoundsOf(line).H() * 0.8 / 2
-	if _, err := fmt.Fprint(r.textDrawer, line); err != nil {
+func (r *GridRenderer) Text(startX, startY uint64, text string, fgColor color.Color) {
+	r.textDrawer.Dot = pixel.V(float64(startX), float64(startY))
+	r.textDrawer.Dot.X += r.textDrawer.BoundsOf(text).W() * 0.8 / 2
+	r.textDrawer.Dot.Y += r.textDrawer.BoundsOf(text).H() * 0.8 / 2
+	if _, err := fmt.Fprint(r.textDrawer, text); err != nil {
 		// TODO: Handle gracefully.
 		panic(err)
 	}
+
 }
 
 func (r *GridRenderer) Clear() {

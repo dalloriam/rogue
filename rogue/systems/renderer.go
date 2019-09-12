@@ -15,14 +15,9 @@ type RenderingEngine interface {
 
 	Rectangle(startX, startY, endX, endY uint64, bgColor color.Color)
 	Text(startX, startY uint64, text string, fgColor color.Color)
-
-	DrawTile(x, y uint64, char rune, fgColor, bgColor color.Color)
 }
 
 type RendererOptions struct {
-	FontFacePath string
-	FontSize     int
-
 	TileSizeX uint64
 	TileSizeY uint64
 }
@@ -87,7 +82,6 @@ func (r *Renderer) Update(worldMap cartography.Map, objects map[uint64]entities.
 				r.engine.Rectangle(startX, startY, startX+r.opt.TileSizeX, startY+r.opt.TileSizeY, drawable.BgColor)
 				r.engine.Text(startX, startY, string([]rune{drawable.Char}), drawable.FgColor)
 			}
-			r.engine.DrawTile(currentTile.X, currentTile.Y, currentTile.Char, currentTile.FgColor, currentTile.BgColor)
 		}
 	}
 
