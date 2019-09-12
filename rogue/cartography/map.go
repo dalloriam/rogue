@@ -1,4 +1,4 @@
-package rogue
+package cartography
 
 import "image/color"
 
@@ -38,4 +38,8 @@ func (m Map) SizeY() uint64 {
 
 func (m Map) At(x, y uint64) Tile {
 	return m[x][y]
+}
+
+func (m Map) Set(x, y uint64, tile Tile) {
+	m[x][y] = tile
 }

@@ -3,7 +3,10 @@ package main
 import (
 	"image/color"
 
+	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/entities"
+
+	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/systems"
 
 	"github.com/dalloriam/rogue/rogue"
@@ -43,11 +46,34 @@ func pixelRun() {
 	world := rogue.NewWorld()
 	world.AddSystem(renderingSystem, 1)
 
-	for i := 0; i < 20; i++ {
-		for j := 0; j < 20; j++ {
-			world.AddObject(entities.NewTile(uint64(i), uint64(j), '#', color.White, color.RGBA{128, 0, 0, 255}))
+	worldMap := cartography.NewMap(20, 20)
+
+	var i, j uint64
+	for i = 0; i < 20; i++ {
+		for j = 0; j < 20; j++ {
+			worldMap.Set(i, j, cartography.Tile{
+				X:       i,
+				Y:       j,
+				Char:    '#',
+				FgColor: color.White,
+				BgColor: color.RGBA{128, 0, 0, 255},
+			})
 		}
 	}
+	world.LoadMap(worldMap)
+
+	player := entities.NewObject(
+		components.Drawable{
+			Char:    '@',
+			FgColor: color.White,
+			BgColor: color.RGBA{0, 0, 0, 0},
+		},
+		components.Position{
+			X: 10,
+			Y: 10,
+		},
+	)
+	world.AddObject(player)
 
 	for r.Running() {
 		if err := world.Tick(); err != nil {

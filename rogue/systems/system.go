@@ -1,12 +1,15 @@
 package systems
 
-import "github.com/dalloriam/rogue/rogue/entities"
+import (
+	"github.com/dalloriam/rogue/rogue/cartography"
+	"github.com/dalloriam/rogue/rogue/entities"
+)
 
 // System represents a system.
 type System interface {
 	// Abstract.
 	ShouldTrack(object entities.GameObject) bool
-	Update(objects map[uint64]entities.GameObject) error
+	Update(worldMap cartography.Map, objects map[uint64]entities.GameObject) error
 }
 
 // GameSystem wraps an abstract system in a well-composed system object.
@@ -23,8 +26,8 @@ func NewGameSystem(sys System) *GameSystem {
 	}
 }
 
-func (b *GameSystem) Update() error {
-	return b.system.Update(b.objects)
+func (b *GameSystem) Update(currentMap cartography.Map) error {
+	return b.system.Update(currentMap, b.objects)
 }
 
 func (b *GameSystem) initialize() {

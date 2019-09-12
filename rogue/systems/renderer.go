@@ -1,27 +1,43 @@
 package systems
 
 import (
+	"image/color"
+
+	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/entities"
-	"image/color"
 )
 
 // RenderingBackend abstracts a rendering engine.
 type RenderingEngine interface {
 	Clear()
 	Draw()
+
+	Rectangle(startX, startY, endX, endY uint64, bgColor color.Color)
+	Text(startX, startY uint64, text string, fgColor color.Color)
+
 	DrawTile(x, y uint64, char rune, fgColor, bgColor color.Color)
+}
+
+type RendererOptions struct {
+	FontFacePath string
+	FontSize     int
+
+	TileSizeX uint64
+	TileSizeY uint64
 }
 
 // A Renderer renders components.
 type Renderer struct {
 	engine RenderingEngine
+	opt    RendererOptions
 }
 
 // NewRenderer returns a new rendering system.
-func NewRenderer(engine RenderingEngine) (*Renderer, error) {
+func NewRenderer(engine RenderingEngine, opt RendererOptions) (*Renderer, error) {
 	return &Renderer{
 		engine: engine,
+		opt:    opt,
 	}, nil
 }
 
@@ -30,24 +46,52 @@ func (r *Renderer) ShouldTrack(object entities.GameObject) bool {
 }
 
 // Update updates the system state.
-func (r *Renderer) Update(objects map[uint64]entities.GameObject) error {
+func (r *Renderer) Update(worldMap cartography.Map, objects map[uint64]entities.GameObject) error {
 
+	// TODO: Get rid of this.
+	// Phase 0 - Clear previous frame.
 	r.engine.Clear()
 
-	// TODO: Next iteration of the render process.
-	// Phase 1 - Draw map changes (Taking viewport into account?)
-	// Phase 2 - Draw all objects.
-	// Phase 3 - Commit to screen
-
-	// Update the canvas for all drawable entities.
+	// - Phase 1 -
+	// Create an object positional map. This will help us drawing the map
+	// by allowing us to perform drawable object lookups by position in O(1).
+	objectMap := make([][]uint64, worldMap.SizeX())
+	var i uint64
+	for i = 0; i < worldMap.SizeX(); i++ {
+		objectMap[i] = make([]uint64, worldMap.SizeY())
+	}
 	for _, obj := range objects {
-		drawable := obj.GetComponent(components.DrawableName).(components.Drawable)
 		position := obj.GetComponent(components.PositionName).(components.Position)
-
-		r.engine.DrawTile(position.X, position.Y, drawable.Char, drawable.FgColor, drawable.BgColor)
+		objectMap[position.X][position.Y] = obj.ID()
 	}
 
-	// Commit the drawing to the screen.
+	// Phase 1 - Draw cartography changes (TODO: Take viewport into account?)
+	for i := 0; i < len(worldMap); i++ {
+		for j := 0; j < len(worldMap[i]); j++ {
+			currentTile := worldMap[i][j]
+			// When drawing the tiles initially, we have no clue if we have an entity at this position.
+			// First, what we know for sure is that we need to draw the map tile background.
+			startX := currentTile.X * r.opt.TileSizeX
+			startY := currentTile.Y * r.opt.TileSizeY
+			r.engine.Rectangle(startX, startY, startX+r.opt.TileSizeX, startY+r.opt.TileSizeY, currentTile.BgColor)
+
+			// Once we have the tile background, we need to check if we have an object on this tile.
+			// If so, we'll draw the object (Bg & Fg), otherwise we'll draw the tile foreground.
+			if objectMap[currentTile.X][currentTile.Y] == 0 {
+				// We don't have an entity. Proceed with the foreground
+				r.engine.Text(startX, startY, string([]rune{currentTile.Char}), currentTile.FgColor)
+			} else {
+				// We have an object. First, draw its background (if it's not transparent).
+				// TODO: Perform this check *before* rendering the tile background to save a drawing call.
+				drawable := objects[objectMap[i][j]].GetComponent(components.DrawableName).(components.Drawable)
+				r.engine.Rectangle(startX, startY, startX+r.opt.TileSizeX, startY+r.opt.TileSizeY, drawable.BgColor)
+				r.engine.Text(startX, startY, string([]rune{drawable.Char}), drawable.FgColor)
+			}
+			r.engine.DrawTile(currentTile.X, currentTile.Y, currentTile.Char, currentTile.FgColor, currentTile.BgColor)
+		}
+	}
+
+	// Phase 2 - Commit to screen
 	r.engine.Draw()
 
 	return nil

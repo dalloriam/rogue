@@ -1,6 +1,7 @@
 package rogue
 
 import (
+	"github.com/dalloriam/rogue/rogue/cartography"
 	"sort"
 
 	"github.com/dalloriam/rogue/rogue/systems"
@@ -15,8 +16,8 @@ type World struct {
 
 	objects map[uint64]entities.GameObject
 
-	// currentMap represents the currently loaded map in its entirety -- NOT the map sections displayed in the viewport.
-	currentMap Map
+	// worldMap represents the currently loaded map in its entirety -- NOT the cartography sections displayed in the viewport.
+	worldMap cartography.Map
 }
 
 func NewWorld() *World {
@@ -26,8 +27,8 @@ func NewWorld() *World {
 	}
 }
 
-func (w *World) LoadMap(m Map) {
-	w.currentMap = m
+func (w *World) LoadMap(m cartography.Map) {
+	w.worldMap = m
 }
 
 func (w *World) AddObject(object entities.GameObject) {
@@ -56,7 +57,7 @@ func (w *World) AddSystem(sys systems.System, priority int) {
 
 func (w *World) Tick() error {
 	for _, system := range w.systems {
-		if err := system.Update(); err != nil {
+		if err := system.Update(w.worldMap); err != nil {
 			return err
 		}
 	}

@@ -12,11 +12,6 @@ import (
 )
 
 type GridRenderOptions struct {
-	// Tiling-related settings.
-	FontFacePath string
-	FontSize     int
-	TileSizeX    uint64
-	TileSizeY    uint64
 
 	// Window-related settings.
 	WindowTitle string
@@ -79,6 +74,17 @@ func (r *GridRenderer) getFontAtlas() (*text.Atlas, error) {
 	return text.NewAtlas(face, text.ASCII), nil
 }
 
+func (r *GridRenderer) Rectangle(startX, startY, endX, endY uint64, bgColor color.Color) {
+	r.imd.Color = bgColor
+
+	origin := pixel.V(float64(startX), float64(startY))
+	r.imd.Push(origin)
+
+	dst := pixel.V(float64(endX), float64(endY))
+	r.imd.Push(dst)
+	r.imd.Rectangle(0)
+}
+
 // DrawTile draws a tile.
 func (r *GridRenderer) DrawTile(x, y uint64, char rune, fgColor, bgColor color.Color) {
 	r.imd.Color = bgColor
@@ -105,7 +111,7 @@ func (r *GridRenderer) Clear() {
 	//  improved at a later time.
 	r.imd.Clear()
 	r.textDrawer.Clear()
-	r.window.Clear(pixel.RGB(0, 0, 0))  // TODO: Make configurable
+	r.window.Clear(pixel.RGB(0, 0, 0)) // TODO: Make configurable
 }
 
 func (r *GridRenderer) Draw() {
