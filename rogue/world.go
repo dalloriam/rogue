@@ -1,8 +1,9 @@
 package rogue
 
 import (
-	"github.com/dalloriam/rogue/rogue/cartography"
 	"sort"
+
+	"github.com/dalloriam/rogue/rogue/cartography"
 
 	"github.com/dalloriam/rogue/rogue/systems"
 
@@ -31,13 +32,18 @@ func (w *World) LoadMap(m cartography.Map) {
 	w.worldMap = m
 }
 
+func (w *World) indexObjects() {
+	for _, system := range w.systems {
+		system.Clear()
+		for _, object := range w.objects {
+			system.AddObject(object)
+		}
+	}
+}
+
 func (w *World) AddObject(object entities.GameObject) {
 	// Add the object to the main registry.
 	w.objects[object.ID()] = object
-
-	for _, system := range w.systems {
-		system.AddObject(object)
-	}
 }
 
 func (w *World) AddSystem(sys systems.System, priority int) {
@@ -56,6 +62,7 @@ func (w *World) AddSystem(sys systems.System, priority int) {
 }
 
 func (w *World) Tick() error {
+	w.indexObjects()
 	for _, system := range w.systems {
 		if err := system.Update(w.worldMap); err != nil {
 			return err

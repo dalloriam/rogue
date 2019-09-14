@@ -40,6 +40,10 @@ func (b *GameSystem) AddObject(object entities.GameObject) {
 	}
 }
 
+func (b *GameSystem) Clear() {
+	b.objects = make(map[uint64]entities.GameObject)
+}
+
 func (b *GameSystem) RemoveObject(id uint64) {
 	delete(b.objects, id)
 }
