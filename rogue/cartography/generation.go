@@ -27,4 +27,5 @@ func (m *LevelManager) Load() error {
 
 // AddLevel
 func (m *LevelManager) AddLevel(name string, template LevelTemplate) {
+	m.levels[name] = template.Generate()
 }

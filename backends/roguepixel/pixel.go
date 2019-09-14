@@ -77,7 +77,7 @@ func (r *GridRenderer) getFontAtlas() (*text.Atlas, error) {
 	return text.NewAtlas(face, text.ASCII), nil
 }
 
-func (r *GridRenderer) Rectangle(startX, startY, endX, endY uint64, bgColor color.Color) {
+func (r *GridRenderer) Rectangle(startX, startY, endX, endY int, bgColor color.Color) {
 	r.imd.Color = bgColor
 
 	origin := pixel.V(float64(startX), float64(startY))
@@ -88,7 +88,8 @@ func (r *GridRenderer) Rectangle(startX, startY, endX, endY uint64, bgColor colo
 	r.imd.Rectangle(0)
 }
 
-func (r *GridRenderer) Text(startX, startY uint64, text string, fgColor color.Color) {
+func (r *GridRenderer) Text(startX, startY int, text string, fgColor color.Color) {
+	r.textDrawer.Color = fgColor
 	r.textDrawer.Dot = pixel.V(float64(startX), float64(startY))
 	r.textDrawer.Dot.X += r.textDrawer.BoundsOf(text).W() * 0.8 / 2
 	r.textDrawer.Dot.Y += r.textDrawer.BoundsOf(text).H() * 0.8 / 2
