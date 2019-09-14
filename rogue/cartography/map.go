@@ -6,6 +6,8 @@ type Tile struct {
 	X int
 	Y int
 
+	Type string // TODO: Find better way of representing tile type.
+
 	Char    rune
 	FgColor color.Color
 	BgColor color.Color

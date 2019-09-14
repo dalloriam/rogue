@@ -20,6 +20,19 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
+func findPlayer(level cartography.Map) (int, int) {
+	// Locate player coordinates
+	// TODO: Improve randomness of player position.
+	for i := 0; i < level.SizeX(); i++ {
+		for j := 0; j < level.SizeY(); j++ {
+			if level.At(i, j).Type == "floor" {
+				return i, j
+			}
+		}
+	}
+	panic("no suitable space")
+}
+
 func pixelRun() {
 
 	// Rogue renderer setup.
@@ -62,7 +75,10 @@ func pixelRun() {
 
 	lvlManager := cartography.NewLevelManager("test.txt", time.Now().UnixNano())
 	lvlManager.AddLevel("dungeon_1", gen)
-	world.LoadMap(lvlManager.GetLevel("dungeon_1"))
+	lvl := lvlManager.GetLevel("dungeon_1")
+	world.LoadMap(lvl)
+
+	playerX, playerY := findPlayer(lvl)
 
 	player := entities.NewObject(
 		components.Drawable{
@@ -71,8 +87,8 @@ func pixelRun() {
 			BgColor: color.RGBA{0, 0, 0, 0},
 		},
 		components.Position{
-			X: 10,
-			Y: 10,
+			X: playerX,
+			Y: playerY,
 		},
 	)
 	world.AddObject(player)

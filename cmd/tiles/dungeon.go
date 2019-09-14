@@ -13,6 +13,7 @@ func RockWall(x, y int) cartography.Tile {
 		Char:    '#',
 		FgColor: color.Black,
 		BgColor: color.Gray{128},
+		Type:    "wall",
 	}
 }
 
@@ -23,5 +24,6 @@ func RockFloor(x, y int) cartography.Tile {
 		Char:    '.',
 		FgColor: color.White,
 		BgColor: color.Black,
+		Type:    "floor",
 	}
 }
