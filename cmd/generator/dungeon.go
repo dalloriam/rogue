@@ -1,9 +1,10 @@
 package generator
 
 import (
-	"image/color"
 	"math"
 	"math/rand"
+
+	"github.com/dalloriam/rogue/cmd/tiles"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
 )
@@ -42,17 +43,15 @@ type DungeonGenerator struct {
 	MaxRoomSize      int
 	MinRoomSize      int
 	MaxNumberOfRooms int
-	MinNumberOfRooms int
 
 	levelMap cartography.Map
 }
 
-func NewDungeonGenerator(maxRoomSize, minRoomSize, maxNumberOfRooms, minNumberOfRooms, mapSizeX, mapSizeY int) *DungeonGenerator {
+func NewDungeonGenerator(maxRoomSize, minRoomSize, maxNumberOfRooms, mapSizeX, mapSizeY int) *DungeonGenerator {
 	return &DungeonGenerator{
 		MaxRoomSize:      maxRoomSize,
 		MinRoomSize:      minRoomSize,
 		MaxNumberOfRooms: maxNumberOfRooms,
-		MinNumberOfRooms: minNumberOfRooms,
 		levelMap:         cartography.NewMap(mapSizeX, mapSizeY),
 	}
 }
@@ -60,13 +59,7 @@ func NewDungeonGenerator(maxRoomSize, minRoomSize, maxNumberOfRooms, minNumberOf
 func (g *DungeonGenerator) fillMapWithRockWalls() {
 	for i := 0; i < g.levelMap.SizeX(); i++ {
 		for j := 0; j < g.levelMap.SizeY(); j++ {
-			g.levelMap.Set(i, j, cartography.Tile{
-				X:       i,
-				Y:       j,
-				Char:    '#',
-				FgColor: color.Black,
-				BgColor: color.Gray{128},
-			})
+			g.levelMap.Set(i, j, tiles.RockWall(i, j))
 		}
 	}
 }
@@ -74,37 +67,19 @@ func (g *DungeonGenerator) fillMapWithRockWalls() {
 func (g *DungeonGenerator) digRectangle(r Rectangle) {
 	for i := r.StartX; i < r.EndX; i++ {
 		for j := r.StartY; j < r.EndY; j++ {
-			g.levelMap.Set(i, j, cartography.Tile{
-				X:       i,
-				Y:       j,
-				Char:    '.',
-				FgColor: color.White,
-				BgColor: color.Black,
-			})
+			g.levelMap.Set(i, j, tiles.RockFloor(i, j))
 		}
 	}
 }
 
 func (g *DungeonGenerator) digVerticalTunnel(startY, endY, x int) {
 	for y := math.Min(float64(startY), float64(endY)); y < math.Max(float64(startY), float64(endY)); y++ {
-		g.levelMap.Set(x, int(y), cartography.Tile{
-			X:       x,
-			Y:       int(y),
-			Char:    '.',
-			FgColor: color.White,
-			BgColor: color.Black,
-		})
+		g.levelMap.Set(x, int(y), tiles.RockFloor(x, int(y)))
 	}
 }
 func (g *DungeonGenerator) digHorizontalTunnel(startX, endX, y int) {
 	for x := math.Min(float64(startX), float64(endX)); x < math.Max(float64(startX), float64(endX)); x++ {
-		g.levelMap.Set(int(x), y, cartography.Tile{
-			X:       int(x),
-			Y:       y,
-			Char:    '.',
-			FgColor: color.White,
-			BgColor: color.Black,
-		})
+		g.levelMap.Set(int(x), y, tiles.RockFloor(int(x), y))
 	}
 }
 

@@ -57,7 +57,6 @@ func pixelRun() {
 		10,
 		6,
 		20,
-		2,
 		int(float64(opt.WindowSizeX)/float64(renderOpt.TileSizeX)), int(float64(opt.WindowSizeY)/float64(renderOpt.TileSizeY)),
 	)
 
