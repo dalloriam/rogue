@@ -14,6 +14,7 @@ type GameObject interface {
 
 	HasComponent(componentName string) bool
 	GetComponent(componentName string) Component
+	RemoveComponent(componentName string)
 }
 
 // BaseObject defines the root game object.
@@ -59,6 +60,10 @@ func (o *BaseObject) AddComponents(components ...Component) {
 	for _, component := range components {
 		o.components[component.Name()] = component
 	}
+}
+
+func (o *BaseObject) RemoveComponent(name string) {
+	delete(o.components, name)
 }
 
 // HasComponent returns whether the current object has the specified component.
