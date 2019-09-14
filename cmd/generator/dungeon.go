@@ -27,8 +27,8 @@ func NewRectangle(x, y, w, h float64) Rectangle {
 		StartY: int(y),
 		EndY:   int(y + h),
 	}
-	r.CenterX = int(math.Round(float64(r.StartX + r.EndX/2)))
-	r.CenterY = int(math.Round(float64(r.StartY + r.EndY/2)))
+	r.CenterX = int(math.Round(float64(r.StartX+r.EndX) / 2))
+	r.CenterY = int(math.Round(float64(r.StartY+r.EndY) / 2))
 
 	return r
 }
@@ -108,24 +108,30 @@ func (g *DungeonGenerator) digHorizontalTunnel(startX, endX, y int) {
 	}
 }
 
-func (g *DungeonGenerator) Generate() cartography.Map {
+func (g *DungeonGenerator) Generate(source *rand.Rand) cartography.Map {
 	// Initialize an empty map.
 	g.fillMapWithRockWalls()
 
 	numRooms := 0
 	var rooms []Rectangle
 
-	for i := 0; i < g.MaxNumberOfRooms; i++ {
-		w := math.Floor(rand.Float64()*float64(g.MaxRoomSize-g.MinRoomSize-1)) + float64(g.MinRoomSize)
-		h := math.Floor(rand.Float64()*float64(g.MaxRoomSize-g.MinRoomSize-1)) + float64(g.MinRoomSize)
+	fmt.Println("Tiles X: ", g.levelMap.SizeX())
+	fmt.Println("Tiles Y: ", g.levelMap.SizeY())
 
-		x := math.Floor(rand.Float64()*(float64(g.levelMap.SizeX())-w-2)) + 1
-		y := math.Floor(rand.Float64()*(float64(g.levelMap.SizeY())-h-2)) + 1
+	for i := 0; i < g.MaxNumberOfRooms; i++ {
+		fmt.Println("Generating a room")
+		w := math.Floor(source.Float64()*float64(g.MaxRoomSize-g.MinRoomSize-1)) + float64(g.MinRoomSize)
+		h := math.Floor(source.Float64()*float64(g.MaxRoomSize-g.MinRoomSize-1)) + float64(g.MinRoomSize)
+
+		x := math.Floor(source.Float64()*(float64(g.levelMap.SizeX())-w-2)) + 1
+		y := math.Floor(source.Float64()*(float64(g.levelMap.SizeY())-h-2)) + 1
 
 		failing := true
 		var newRoom Rectangle
 
-		for failing {
+		attempts := 0
+		for failing && attempts <= 50 {
+			fmt.Println("Failed")
 			newRoom = NewRectangle(x, y, w, h)
 
 			// Make sure this room intersects with no other room.
@@ -135,6 +141,11 @@ func (g *DungeonGenerator) Generate() cartography.Map {
 					failing = true
 				}
 			}
+			attempts++
+		}
+
+		if attempts > 10 {
+			break
 		}
 
 		g.digRectangle(newRoom)
@@ -144,8 +155,7 @@ func (g *DungeonGenerator) Generate() cartography.Map {
 			prevX := rooms[numRooms-1].CenterX
 			prevY := rooms[numRooms-1].CenterY
 
-			fmt.Println("HERE")
-			if rand.Float64() > 0.5 {
+			if source.Float64() > 0.5 {
 				g.digHorizontalTunnel(prevX, newRoom.CenterX, prevY)
 				g.digVerticalTunnel(prevY, newRoom.CenterY, newRoom.CenterX)
 			} else {

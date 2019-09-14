@@ -2,6 +2,9 @@ package main
 
 import (
 	"image/color"
+	"time"
+
+	"github.com/dalloriam/rogue/rogue/cartography"
 
 	"github.com/dalloriam/rogue/cmd/generator"
 
@@ -53,10 +56,13 @@ func pixelRun() {
 	gen := generator.NewDungeonGenerator(
 		10,
 		6,
-		3,
+		5,
 		int(float64(opt.WindowSizeX)/float64(renderOpt.TileSizeX)), int(float64(opt.WindowSizeY)/float64(renderOpt.TileSizeY)),
 	)
-	world.LoadMap(gen.Generate())
+
+	lvlManager := cartography.NewLevelManager("test.txt", time.Now().UnixNano())
+	lvlManager.AddLevel("dungeon_1", gen)
+	world.LoadMap(lvlManager.GetLevel("dungeon_1"))
 
 	player := entities.NewObject(
 		components.Drawable{
