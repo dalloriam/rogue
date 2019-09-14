@@ -2,11 +2,15 @@ package main
 
 import (
 	"image/color"
+	"time"
+
+	"github.com/dalloriam/rogue/rogue/cartography"
+
+	"github.com/dalloriam/rogue/cmd/generator"
 
 	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/entities"
 
-	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/systems"
 
 	"github.com/dalloriam/rogue/rogue"
@@ -16,29 +20,44 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
+func findPlayer(level cartography.Map) (int, int) {
+	// Locate player coordinates
+	// TODO: Improve randomness of player position.
+	for i := 0; i < level.SizeX(); i++ {
+		for j := 0; j < level.SizeY(); j++ {
+			if level.At(i, j).Type == "floor" {
+				return i, j
+			}
+		}
+	}
+	panic("no suitable space")
+}
+
 func pixelRun() {
 
 	// Rogue renderer setup.
-	r, err := roguepixel.NewRenderer(roguepixel.GridRenderOptions{
+	opt := roguepixel.GridRenderOptions{
 		FontFacePath: "data/font.ttf",
-		FontSize:     22,
+		FontSize:     19,
 
 		WindowTitle: "Rogue Demo",
-		WindowSizeX: 1024,
-		WindowSizeY: 768,
+		WindowSizeX: 1300,
+		WindowSizeY: 900,
 
 		SmoothDrawing: true,
 		VSync:         true,
-	})
+	}
+	r, err := roguepixel.NewRenderer(opt)
 	if err != nil {
 		panic(err)
 	}
 
 	// Creating system from rogue renderer.
-	renderingSystem, err := systems.NewRenderer(r, systems.RendererOptions{
-		TileSizeX: 30,
-		TileSizeY: 30,
-	})
+	renderOpt := systems.RendererOptions{
+		TileSizeX: 25,
+		TileSizeY: 25,
+	}
+	renderingSystem, err := systems.NewRenderer(r, renderOpt)
 	if err != nil {
 		panic(err)
 	}
@@ -47,21 +66,19 @@ func pixelRun() {
 	world := rogue.NewWorld()
 	world.AddSystem(renderingSystem, 1)
 
-	worldMap := cartography.NewMap(20, 20)
+	gen := generator.NewDungeonGenerator(
+		10,
+		6,
+		20,
+		int(float64(opt.WindowSizeX)/float64(renderOpt.TileSizeX)), int(float64(opt.WindowSizeY)/float64(renderOpt.TileSizeY)),
+	)
 
-	var i, j uint64
-	for i = 0; i < 20; i++ {
-		for j = 0; j < 20; j++ {
-			worldMap.Set(i, j, cartography.Tile{
-				X:       i,
-				Y:       j,
-				Char:    '#',
-				FgColor: color.White,
-				BgColor: color.RGBA{128, 0, 0, 255},
-			})
-		}
-	}
-	world.LoadMap(worldMap)
+	lvlManager := cartography.NewLevelManager("test.txt", time.Now().UnixNano())
+	lvlManager.AddLevel("dungeon_1", gen)
+	lvl := lvlManager.GetLevel("dungeon_1")
+	world.LoadMap(lvl)
+
+	playerX, playerY := findPlayer(lvl)
 
 	player := entities.NewObject(
 		components.Drawable{
@@ -70,8 +87,8 @@ func pixelRun() {
 			BgColor: color.RGBA{0, 0, 0, 0},
 		},
 		components.Position{
-			X: 10,
-			Y: 10,
+			X: playerX,
+			Y: playerY,
 		},
 	)
 	world.AddObject(player)

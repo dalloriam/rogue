@@ -13,13 +13,13 @@ type RenderingEngine interface {
 	Clear()
 	Draw()
 
-	Rectangle(startX, startY, endX, endY uint64, bgColor color.Color)
-	Text(startX, startY uint64, text string, fgColor color.Color)
+	Rectangle(startX, startY, endX, endY int, bgColor color.Color)
+	Text(startX, startY int, text string, fgColor color.Color)
 }
 
 type RendererOptions struct {
-	TileSizeX uint64
-	TileSizeY uint64
+	TileSizeX int
+	TileSizeY int
 }
 
 // A Renderer renders components.
@@ -51,8 +51,7 @@ func (r *Renderer) Update(worldMap cartography.Map, objects map[uint64]entities.
 	// Create an object positional map. This will help us drawing the map
 	// by allowing us to perform drawable object lookups by position in O(1).
 	objectMap := make([][]uint64, worldMap.SizeX())
-	var i uint64
-	for i = 0; i < worldMap.SizeX(); i++ {
+	for i := 0; i < worldMap.SizeX(); i++ {
 		objectMap[i] = make([]uint64, worldMap.SizeY())
 	}
 	for _, obj := range objects {
