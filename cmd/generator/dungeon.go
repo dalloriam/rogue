@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"fmt"
 	"image/color"
 	"math"
 	"math/rand"
@@ -43,15 +42,17 @@ type DungeonGenerator struct {
 	MaxRoomSize      int
 	MinRoomSize      int
 	MaxNumberOfRooms int
+	MinNumberOfRooms int
 
 	levelMap cartography.Map
 }
 
-func NewDungeonGenerator(maxRoomSize, minRoomSize, maxNumberOfRooms, mapSizeX, mapSizeY int) *DungeonGenerator {
+func NewDungeonGenerator(maxRoomSize, minRoomSize, maxNumberOfRooms, minNumberOfRooms, mapSizeX, mapSizeY int) *DungeonGenerator {
 	return &DungeonGenerator{
 		MaxRoomSize:      maxRoomSize,
 		MinRoomSize:      minRoomSize,
 		MaxNumberOfRooms: maxNumberOfRooms,
+		MinNumberOfRooms: minNumberOfRooms,
 		levelMap:         cartography.NewMap(mapSizeX, mapSizeY),
 	}
 }
@@ -96,7 +97,6 @@ func (g *DungeonGenerator) digVerticalTunnel(startY, endY, x int) {
 	}
 }
 func (g *DungeonGenerator) digHorizontalTunnel(startX, endX, y int) {
-	fmt.Println(startX, endX)
 	for x := math.Min(float64(startX), float64(endX)); x < math.Max(float64(startX), float64(endX)); x++ {
 		g.levelMap.Set(int(x), y, cartography.Tile{
 			X:       int(x),
@@ -109,29 +109,24 @@ func (g *DungeonGenerator) digHorizontalTunnel(startX, endX, y int) {
 }
 
 func (g *DungeonGenerator) Generate(source *rand.Rand) cartography.Map {
+	maxAttempts := 50
 	// Initialize an empty map.
 	g.fillMapWithRockWalls()
 
 	numRooms := 0
 	var rooms []Rectangle
 
-	fmt.Println("Tiles X: ", g.levelMap.SizeX())
-	fmt.Println("Tiles Y: ", g.levelMap.SizeY())
-
 	for i := 0; i < g.MaxNumberOfRooms; i++ {
-		fmt.Println("Generating a room")
-		w := math.Floor(source.Float64()*float64(g.MaxRoomSize-g.MinRoomSize-1)) + float64(g.MinRoomSize)
-		h := math.Floor(source.Float64()*float64(g.MaxRoomSize-g.MinRoomSize-1)) + float64(g.MinRoomSize)
-
-		x := math.Floor(source.Float64()*(float64(g.levelMap.SizeX())-w-2)) + 1
-		y := math.Floor(source.Float64()*(float64(g.levelMap.SizeY())-h-2)) + 1
-
 		failing := true
 		var newRoom Rectangle
 
 		attempts := 0
-		for failing && attempts <= 50 {
-			fmt.Println("Failed")
+		for failing && attempts <= maxAttempts {
+			w := math.Floor(source.Float64()*float64(g.MaxRoomSize-g.MinRoomSize-1)) + float64(g.MinRoomSize)
+			h := math.Floor(source.Float64()*float64(g.MaxRoomSize-g.MinRoomSize-1)) + float64(g.MinRoomSize)
+
+			x := math.Floor(source.Float64()*(float64(g.levelMap.SizeX())-w-2)) + 1
+			y := math.Floor(source.Float64()*(float64(g.levelMap.SizeY())-h-2)) + 1
 			newRoom = NewRectangle(x, y, w, h)
 
 			// Make sure this room intersects with no other room.
@@ -144,7 +139,7 @@ func (g *DungeonGenerator) Generate(source *rand.Rand) cartography.Map {
 			attempts++
 		}
 
-		if attempts > 10 {
+		if attempts > maxAttempts {
 			break
 		}
 
