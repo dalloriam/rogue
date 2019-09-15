@@ -1,9 +1,9 @@
-name: Build & Functional Tests
+name: Tests
 on: [push]
 jobs:
 
   build:
-    name: Build
+    name: Engine Tests
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.13
