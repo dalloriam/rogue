@@ -92,6 +92,7 @@ func pixelRun() {
 			X: playerX,
 			Y: playerY,
 		},
+		&components.Physics{BlockedBy: []string{"wall"}},
 		&components.PlayerControl{},
 	)
 	world.AddObject(player)

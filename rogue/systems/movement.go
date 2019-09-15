@@ -24,18 +24,36 @@ func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, obje
 		movement := object.GetComponent(components.MovementName).(*components.Movement)
 		position := object.GetComponent(components.PositionName).(*components.Position)
 
+		newPosition := components.Position{
+			X: position.X,
+			Y: position.Y,
+		}
+
 		switch movement.Direction {
 		case cartography.DirectionUp:
-			position.Y++
+			newPosition.Y++
 		case cartography.DirectionDown:
-			position.Y--
+			newPosition.Y--
 		case cartography.DirectionLeft:
-			position.X--
+			newPosition.X--
 		case cartography.DirectionRight:
-			position.X++
+			newPosition.X++
 		}
 
 		object.RemoveComponent(components.MovementName)
+
+		// Check if the movement is blocked before triggering.
+		if object.HasComponent(components.PhysicsName) {
+			phys := object.GetComponent(components.PhysicsName).(*components.Physics)
+			tgtTile := worldMap.At(newPosition.X, newPosition.Y)
+
+			if !phys.IsBlocked(tgtTile.Type) {
+
+				object.AddComponents(&newPosition)
+			}
+		} else {
+			object.AddComponents(&newPosition)
+		}
 	}
 	return nil
 }
