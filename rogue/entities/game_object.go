@@ -12,6 +12,7 @@ type GameObject interface {
 	AppendChild(child GameObject)
 	SetParent(parent GameObject)
 
+	AddComponents(c ...Component)
 	HasComponent(componentName string) bool
 	GetComponent(componentName string) Component
 	RemoveComponent(componentName string)

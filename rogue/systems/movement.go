@@ -1,6 +1,8 @@
 package systems
 
 import (
+	"time"
+
 	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/entities"
@@ -17,19 +19,19 @@ func (s *MovementSystem) ShouldTrack(object entities.GameObject) bool {
 	return object.HasComponent(components.MovementName) && object.HasComponent(components.PositionName)
 }
 
-func (s *MovementSystem) Update(worldMap cartography.Map, objects map[uint64]entities.GameObject) error {
+func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]entities.GameObject) error {
 	for _, object := range objects {
-		movement := object.GetComponent(components.MovementName).(components.Movement)
-		position := object.GetComponent(components.PositionName).(components.Position)
+		movement := object.GetComponent(components.MovementName).(*components.Movement)
+		position := object.GetComponent(components.PositionName).(*components.Position)
 
 		switch movement.Direction {
-		case components.DirectionUp:
+		case cartography.DirectionUp:
 			position.Y++
-		case components.DirectionDown:
+		case cartography.DirectionDown:
 			position.Y--
-		case components.DirectionLeft:
+		case cartography.DirectionLeft:
 			position.X--
-		case components.DirectionRight:
+		case cartography.DirectionRight:
 			position.X++
 		}
 

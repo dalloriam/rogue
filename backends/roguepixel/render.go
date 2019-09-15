@@ -29,7 +29,7 @@ type GridRenderOptions struct {
 // GridRenderer abstracts a pixel-powered grid renderer.
 type GridRenderer struct {
 	opt    GridRenderOptions
-	window *pixelgl.Window
+	Window *pixelgl.Window
 
 	imd        *imdraw.IMDraw
 	textDrawer *text.Text
@@ -54,7 +54,7 @@ func NewRenderer(opt GridRenderOptions) (*GridRenderer, error) {
 	r := GridRenderer{
 		opt:    opt,
 		imd:    imdraw.New(win),
-		window: win,
+		Window: win,
 	}
 
 	// Load the main font.
@@ -105,15 +105,15 @@ func (r *GridRenderer) Clear() {
 	//  improved at a later time.
 	r.imd.Clear()
 	r.textDrawer.Clear()
-	r.window.Clear(pixel.RGB(0, 0, 0)) // TODO: Make configurable
+	r.Window.Clear(pixel.RGB(0, 0, 0)) // TODO: Make configurable
 }
 
 func (r *GridRenderer) Draw() {
-	r.imd.Draw(r.window)
-	r.textDrawer.Draw(r.window, pixel.IM)
-	r.window.Update()
+	r.imd.Draw(r.Window)
+	r.textDrawer.Draw(r.Window, pixel.IM)
+	r.Window.Update()
 }
 
 func (r *GridRenderer) Running() bool {
-	return !r.window.Closed()
+	return !r.Window.Closed()
 }

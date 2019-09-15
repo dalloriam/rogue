@@ -2,6 +2,9 @@ package rogue
 
 import (
 	"sort"
+	"time"
+
+	"github.com/dalloriam/rogue/rogue/gameplay"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
 
@@ -17,6 +20,9 @@ type World struct {
 
 	objects map[uint64]entities.GameObject
 
+	lastTick  time.Time
+	turnClock *gameplay.TurnClock
+
 	// worldMap represents the currently loaded map in its entirety -- NOT the cartography sections displayed in the viewport.
 	worldMap cartography.Map
 }
@@ -25,20 +31,12 @@ func NewWorld() *World {
 	return &World{
 		systemPriorities: make(map[*systems.GameSystem]int),
 		objects:          make(map[uint64]entities.GameObject),
+		lastTick:         time.Now(),
 	}
 }
 
 func (w *World) LoadMap(m cartography.Map) {
 	w.worldMap = m
-}
-
-func (w *World) indexObjects() {
-	for _, system := range w.systems {
-		system.Clear()
-		for _, object := range w.objects {
-			system.AddObject(object)
-		}
-	}
 }
 
 func (w *World) AddObject(object entities.GameObject) {
@@ -62,9 +60,11 @@ func (w *World) AddSystem(sys systems.System, priority int) {
 }
 
 func (w *World) Tick() error {
-	w.indexObjects()
+	dT := time.Since(w.lastTick)
+	w.lastTick = time.Now()
+
 	for _, system := range w.systems {
-		if err := system.Update(w.worldMap); err != nil {
+		if err := system.Update(dT, w.worldMap, w.objects); err != nil {
 			return err
 		}
 	}

@@ -65,6 +65,8 @@ func pixelRun() {
 	// Creating the world.
 	world := rogue.NewWorld()
 	world.AddSystem(renderingSystem, 1)
+	world.AddSystem(systems.NewMovementSystem(), 2)
+	world.AddSystem(systems.NewControllerSystem(roguepixel.NewInputHandler(r.Window)), 999)
 
 	gen := generator.NewDungeonGenerator(
 		10,
@@ -81,15 +83,16 @@ func pixelRun() {
 	playerX, playerY := findPlayer(lvl)
 
 	player := entities.NewObject(
-		components.Drawable{
+		&components.Drawable{
 			Char:    '@',
 			FgColor: color.White,
 			BgColor: color.RGBA{0, 0, 0, 0},
 		},
-		components.Position{
+		&components.Position{
 			X: playerX,
 			Y: playerY,
 		},
+		&components.PlayerControl{},
 	)
 	world.AddObject(player)
 
