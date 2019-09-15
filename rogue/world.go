@@ -1,12 +1,16 @@
 package rogue
 
 import (
-	"github.com/dalloriam/rogue/rogue/cartography"
 	"sort"
+	"time"
+
+	"github.com/dalloriam/rogue/rogue/gameplay"
+
+	"github.com/dalloriam/rogue/rogue/cartography"
 
 	"github.com/dalloriam/rogue/rogue/systems"
 
-	"github.com/dalloriam/rogue/rogue/entities"
+	"github.com/dalloriam/rogue/rogue/objects"
 )
 
 // World represents the root World.
@@ -14,7 +18,10 @@ type World struct {
 	systemPriorities map[*systems.GameSystem]int
 	systems          []*systems.GameSystem
 
-	objects map[uint64]entities.GameObject
+	objects map[uint64]objects.GameObject
+
+	lastTick  time.Time
+	turnClock *gameplay.TurnClock
 
 	// worldMap represents the currently loaded map in its entirety -- NOT the cartography sections displayed in the viewport.
 	worldMap cartography.Map
@@ -23,7 +30,8 @@ type World struct {
 func NewWorld() *World {
 	return &World{
 		systemPriorities: make(map[*systems.GameSystem]int),
-		objects:          make(map[uint64]entities.GameObject),
+		objects:          make(map[uint64]objects.GameObject),
+		lastTick:         time.Now(),
 	}
 }
 
@@ -31,13 +39,9 @@ func (w *World) LoadMap(m cartography.Map) {
 	w.worldMap = m
 }
 
-func (w *World) AddObject(object entities.GameObject) {
+func (w *World) AddObject(object objects.GameObject) {
 	// Add the object to the main registry.
 	w.objects[object.ID()] = object
-
-	for _, system := range w.systems {
-		system.AddObject(object)
-	}
 }
 
 func (w *World) AddSystem(sys systems.System, priority int) {
@@ -56,8 +60,11 @@ func (w *World) AddSystem(sys systems.System, priority int) {
 }
 
 func (w *World) Tick() error {
+	dT := time.Since(w.lastTick)
+	w.lastTick = time.Now()
+
 	for _, system := range w.systems {
-		if err := system.Update(w.worldMap); err != nil {
+		if err := system.Update(dT, w.worldMap, w.objects); err != nil {
 			return err
 		}
 	}

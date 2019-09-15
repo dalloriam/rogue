@@ -10,6 +10,6 @@ type Position struct {
 	Y int
 }
 
-func (p Position) Name() string {
+func (p *Position) Name() string {
 	return PositionName
 }

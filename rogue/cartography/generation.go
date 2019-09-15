@@ -23,19 +23,13 @@ func NewLevelManager(levelFilePath string, seed int64) *LevelManager {
 	}
 }
 
-func (m *LevelManager) GetLevel(name string) Map {
-	return m.levels[name]
-}
-
-func (m *LevelManager) Save() error {
-	return nil
-}
-
-func (m *LevelManager) Load() error {
-	return nil
+func (m *LevelManager) GetLevel(name string) (Map, bool) {
+	lvl, ok := m.levels[name]
+	return lvl, ok
 }
 
 // AddLevel
-func (m *LevelManager) AddLevel(name string, template LevelTemplate) {
+func (m *LevelManager) AddLevel(name string, template LevelTemplate) Map {
 	m.levels[name] = template.Generate(m.randomSource)
+	return m.levels[name]
 }

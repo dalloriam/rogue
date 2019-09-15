@@ -2,10 +2,11 @@ package systems
 
 import (
 	"image/color"
+	"time"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/components"
-	"github.com/dalloriam/rogue/rogue/entities"
+	"github.com/dalloriam/rogue/rogue/objects"
 )
 
 // RenderingBackend abstracts a rendering engine.
@@ -36,12 +37,12 @@ func NewRenderer(engine RenderingEngine, opt RendererOptions) (*Renderer, error)
 	}, nil
 }
 
-func (r *Renderer) ShouldTrack(object entities.GameObject) bool {
+func (r *Renderer) ShouldTrack(object objects.GameObject) bool {
 	return object.HasComponent(components.DrawableName) && object.HasComponent(components.PositionName)
 }
 
 // Update updates the system state.
-func (r *Renderer) Update(worldMap cartography.Map, objects map[uint64]entities.GameObject) error {
+func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]objects.GameObject) error {
 
 	// TODO: Get rid of this.
 	// Phase 0 - Clear previous frame.
@@ -55,7 +56,7 @@ func (r *Renderer) Update(worldMap cartography.Map, objects map[uint64]entities.
 		objectMap[i] = make([]uint64, worldMap.SizeY())
 	}
 	for _, obj := range objects {
-		position := obj.GetComponent(components.PositionName).(components.Position)
+		position := obj.GetComponent(components.PositionName).(*components.Position)
 		objectMap[position.X][position.Y] = obj.ID()
 	}
 
@@ -77,7 +78,7 @@ func (r *Renderer) Update(worldMap cartography.Map, objects map[uint64]entities.
 			} else {
 				// We have an object. First, draw its background (if it's not transparent).
 				// TODO: Perform this check *before* rendering the tile background to save a drawing call.
-				drawable := objects[objectMap[i][j]].GetComponent(components.DrawableName).(components.Drawable)
+				drawable := objects[objectMap[i][j]].GetComponent(components.DrawableName).(*components.Drawable)
 				r.engine.Rectangle(startX, startY, startX+r.opt.TileSizeX, startY+r.opt.TileSizeY, drawable.BgColor)
 				r.engine.Text(startX, startY, string([]rune{drawable.Char}), drawable.FgColor)
 			}

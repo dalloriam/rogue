@@ -1,4 +1,4 @@
-package entities
+package objects
 
 import "sync/atomic"
 
@@ -12,8 +12,10 @@ type GameObject interface {
 	AppendChild(child GameObject)
 	SetParent(parent GameObject)
 
+	AddComponents(c ...Component)
 	HasComponent(componentName string) bool
 	GetComponent(componentName string) Component
+	RemoveComponent(componentName string)
 }
 
 // BaseObject defines the root game object.
@@ -26,8 +28,8 @@ type BaseObject struct {
 	children []GameObject
 }
 
-// NewObject returns a new game object.
-func NewObject(components ...Component) *BaseObject {
+// New returns a new game object.
+func New(components ...Component) *BaseObject {
 	componentMap := make(map[string]Component)
 	for _, component := range components {
 		componentMap[component.Name()] = component
@@ -44,21 +46,15 @@ func (o *BaseObject) ID() uint64 {
 	return o.id
 }
 
-func (o *BaseObject) SetParent(parent GameObject) {
-
-}
-
-// AppendChild appends a child to the current object.
-func (o *BaseObject) AppendChild(child GameObject) {
-	child.SetParent(o)
-	o.children = append(o.children, child)
-}
-
 // AddComponents adds components to the entity.
 func (o *BaseObject) AddComponents(components ...Component) {
 	for _, component := range components {
 		o.components[component.Name()] = component
 	}
+}
+
+func (o *BaseObject) RemoveComponent(name string) {
+	delete(o.components, name)
 }
 
 // HasComponent returns whether the current object has the specified component.

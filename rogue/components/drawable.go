@@ -15,6 +15,6 @@ type Drawable struct {
 }
 
 // Name returns the component's name
-func (d Drawable) Name() string {
+func (d *Drawable) Name() string {
 	return DrawableName
 }

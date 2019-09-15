@@ -9,7 +9,7 @@ import (
 	"github.com/dalloriam/rogue/cmd/generator"
 
 	"github.com/dalloriam/rogue/rogue/components"
-	"github.com/dalloriam/rogue/rogue/entities"
+	"github.com/dalloriam/rogue/rogue/objects"
 
 	"github.com/dalloriam/rogue/rogue/systems"
 
@@ -65,6 +65,8 @@ func pixelRun() {
 	// Creating the world.
 	world := rogue.NewWorld()
 	world.AddSystem(renderingSystem, 1)
+	world.AddSystem(systems.NewMovementSystem(), 2)
+	world.AddSystem(systems.NewControllerSystem(roguepixel.NewInputHandler(r.Window)), 999)
 
 	gen := generator.NewDungeonGenerator(
 		10,
@@ -75,21 +77,26 @@ func pixelRun() {
 
 	lvlManager := cartography.NewLevelManager("test.txt", time.Now().UnixNano())
 	lvlManager.AddLevel("dungeon_1", gen)
-	lvl := lvlManager.GetLevel("dungeon_1")
+	lvl, ok := lvlManager.GetLevel("dungeon_1")
+	if !ok {
+		panic("level does not exist")
+	}
 	world.LoadMap(lvl)
 
 	playerX, playerY := findPlayer(lvl)
 
-	player := entities.NewObject(
-		components.Drawable{
+	player := objects.New(
+		&components.Drawable{
 			Char:    '@',
 			FgColor: color.White,
 			BgColor: color.RGBA{0, 0, 0, 0},
 		},
-		components.Position{
+		&components.Position{
 			X: playerX,
 			Y: playerY,
 		},
+		&components.Physics{BlockedBy: []string{"wall"}},
+		&components.PlayerControl{},
 	)
 	world.AddObject(player)
 
