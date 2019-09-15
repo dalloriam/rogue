@@ -9,7 +9,7 @@ import (
 	"github.com/dalloriam/rogue/cmd/generator"
 
 	"github.com/dalloriam/rogue/rogue/components"
-	"github.com/dalloriam/rogue/rogue/entities"
+	"github.com/dalloriam/rogue/rogue/objects"
 
 	"github.com/dalloriam/rogue/rogue/systems"
 
@@ -77,12 +77,15 @@ func pixelRun() {
 
 	lvlManager := cartography.NewLevelManager("test.txt", time.Now().UnixNano())
 	lvlManager.AddLevel("dungeon_1", gen)
-	lvl := lvlManager.GetLevel("dungeon_1")
+	lvl, ok := lvlManager.GetLevel("dungeon_1")
+	if !ok {
+		panic("level does not exist")
+	}
 	world.LoadMap(lvl)
 
 	playerX, playerY := findPlayer(lvl)
 
-	player := entities.NewObject(
+	player := objects.New(
 		&components.Drawable{
 			Char:    '@',
 			FgColor: color.White,

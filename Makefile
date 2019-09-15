@@ -80,3 +80,7 @@ bump-version: ## Bump the version in the version file. Set BUMP to [ patch | maj
 tag: ## Create a new git tag to prepare to build a release.
 	git tag -a $(VERSION) -m "$(VERSION)"
 	@echo "Run git push origin $(VERSION) to push your new tag to GitHub and trigger a travis build."
+
+.PHONY: test
+test:
+	go test -cover -race ./rogue/...

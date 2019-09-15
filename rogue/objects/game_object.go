@@ -1,4 +1,4 @@
-package entities
+package objects
 
 import "sync/atomic"
 
@@ -28,8 +28,8 @@ type BaseObject struct {
 	children []GameObject
 }
 
-// NewObject returns a new game object.
-func NewObject(components ...Component) *BaseObject {
+// New returns a new game object.
+func New(components ...Component) *BaseObject {
 	componentMap := make(map[string]Component)
 	for _, component := range components {
 		componentMap[component.Name()] = component
@@ -44,16 +44,6 @@ func NewObject(components ...Component) *BaseObject {
 // ID returns the BaseObject's ID.
 func (o *BaseObject) ID() uint64 {
 	return o.id
-}
-
-func (o *BaseObject) SetParent(parent GameObject) {
-
-}
-
-// AppendChild appends a child to the current object.
-func (o *BaseObject) AppendChild(child GameObject) {
-	child.SetParent(o)
-	o.children = append(o.children, child)
 }
 
 // AddComponents adds components to the entity.

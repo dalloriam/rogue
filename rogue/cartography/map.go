@@ -41,6 +41,6 @@ func (m Map) At(x, y int) Tile {
 	return m[x][y]
 }
 
-func (m Map) Set(x, y int, tile Tile) {
-	m[x][y] = tile
+func (m Map) Set(tile Tile) {
+	m[tile.X][tile.Y] = tile
 }

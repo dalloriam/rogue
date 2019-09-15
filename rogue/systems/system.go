@@ -4,14 +4,14 @@ import (
 	"time"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
-	"github.com/dalloriam/rogue/rogue/entities"
+	"github.com/dalloriam/rogue/rogue/objects"
 )
 
 // System represents a system.
 type System interface {
 	// Abstract.
-	ShouldTrack(object entities.GameObject) bool
-	Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]entities.GameObject) error
+	ShouldTrack(object objects.GameObject) bool
+	Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]objects.GameObject) error
 }
 
 // GameSystem wraps an abstract system in a well-composed system object.
@@ -26,10 +26,10 @@ func NewGameSystem(sys System) *GameSystem {
 	}
 }
 
-func (b *GameSystem) Update(dT time.Duration, currentMap cartography.Map, objects map[uint64]entities.GameObject) error {
-	// Filter out invalid entities.
-	desiredObjects := make(map[uint64]entities.GameObject)
-	for objID, obj := range objects {
+func (b *GameSystem) Update(dT time.Duration, currentMap cartography.Map, gameObjects map[uint64]objects.GameObject) error {
+	// Filter out invalid objects.
+	desiredObjects := make(map[uint64]objects.GameObject)
+	for objID, obj := range gameObjects {
 		if b.system.ShouldTrack(obj) {
 			desiredObjects[objID] = obj
 		}

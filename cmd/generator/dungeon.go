@@ -59,7 +59,7 @@ func NewDungeonGenerator(maxRoomSize, minRoomSize, maxNumberOfRooms, mapSizeX, m
 func (g *DungeonGenerator) fillMapWithRockWalls() {
 	for i := 0; i < g.levelMap.SizeX(); i++ {
 		for j := 0; j < g.levelMap.SizeY(); j++ {
-			g.levelMap.Set(i, j, tiles.RockWall(i, j))
+			g.levelMap.Set(tiles.RockWall(i, j))
 		}
 	}
 }
@@ -67,19 +67,19 @@ func (g *DungeonGenerator) fillMapWithRockWalls() {
 func (g *DungeonGenerator) digRectangle(r Rectangle) {
 	for i := r.StartX; i < r.EndX; i++ {
 		for j := r.StartY; j < r.EndY; j++ {
-			g.levelMap.Set(i, j, tiles.RockFloor(i, j))
+			g.levelMap.Set(tiles.RockFloor(i, j))
 		}
 	}
 }
 
 func (g *DungeonGenerator) digVerticalTunnel(startY, endY, x int) {
 	for y := math.Min(float64(startY), float64(endY)); y < math.Max(float64(startY), float64(endY)); y++ {
-		g.levelMap.Set(x, int(y), tiles.RockFloor(x, int(y)))
+		g.levelMap.Set(tiles.RockFloor(x, int(y)))
 	}
 }
 func (g *DungeonGenerator) digHorizontalTunnel(startX, endX, y int) {
 	for x := math.Min(float64(startX), float64(endX)); x < math.Max(float64(startX), float64(endX)); x++ {
-		g.levelMap.Set(int(x), y, tiles.RockFloor(int(x), y))
+		g.levelMap.Set(tiles.RockFloor(int(x), y))
 	}
 }
 

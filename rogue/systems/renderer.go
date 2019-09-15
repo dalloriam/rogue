@@ -6,7 +6,7 @@ import (
 
 	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/components"
-	"github.com/dalloriam/rogue/rogue/entities"
+	"github.com/dalloriam/rogue/rogue/objects"
 )
 
 // RenderingBackend abstracts a rendering engine.
@@ -37,12 +37,12 @@ func NewRenderer(engine RenderingEngine, opt RendererOptions) (*Renderer, error)
 	}, nil
 }
 
-func (r *Renderer) ShouldTrack(object entities.GameObject) bool {
+func (r *Renderer) ShouldTrack(object objects.GameObject) bool {
 	return object.HasComponent(components.DrawableName) && object.HasComponent(components.PositionName)
 }
 
 // Update updates the system state.
-func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]entities.GameObject) error {
+func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]objects.GameObject) error {
 
 	// TODO: Get rid of this.
 	// Phase 0 - Clear previous frame.
