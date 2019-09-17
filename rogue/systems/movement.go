@@ -5,7 +5,7 @@ import (
 
 	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/components"
-	"github.com/dalloriam/rogue/rogue/objects"
+	"github.com/dalloriam/rogue/rogue/object"
 )
 
 type MovementSystem struct {
@@ -15,11 +15,11 @@ func NewMovementSystem() *MovementSystem {
 	return &MovementSystem{}
 }
 
-func (s *MovementSystem) ShouldTrack(object objects.GameObject) bool {
+func (s *MovementSystem) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.MovementName) && object.HasComponent(components.PositionName)
 }
 
-func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]objects.GameObject) error {
+func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
 	for _, object := range objects {
 		movement := object.GetComponent(components.MovementName).(*components.Movement)
 		position := object.GetComponent(components.PositionName).(*components.Position)

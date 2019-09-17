@@ -9,7 +9,7 @@ import (
 	"github.com/dalloriam/rogue/cmd/generator"
 
 	"github.com/dalloriam/rogue/rogue/components"
-	"github.com/dalloriam/rogue/rogue/objects"
+	"github.com/dalloriam/rogue/rogue/object"
 
 	"github.com/dalloriam/rogue/rogue/systems"
 
@@ -85,7 +85,7 @@ func pixelRun() {
 
 	playerX, playerY := findPlayer(lvl)
 
-	player := objects.New(
+	player := object.New(
 		&components.Drawable{
 			Char:    '@',
 			FgColor: color.White,

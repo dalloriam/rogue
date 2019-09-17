@@ -1,15 +1,15 @@
-package objects_test
+package object_test
 
 import (
 	"testing"
 
 	"github.com/dalloriam/rogue/rogue/components"
 
-	"github.com/dalloriam/rogue/rogue/objects"
+	"github.com/dalloriam/rogue/rogue/object"
 )
 
 func TestNewObject(t *testing.T) {
-	obj1 := objects.New(&components.PlayerControl{}, &components.Position{
+	obj1 := object.New(&components.PlayerControl{}, &components.Position{
 		X: 0,
 		Y: 0,
 	})
@@ -29,7 +29,7 @@ func TestNewObject(t *testing.T) {
 		return
 	}
 
-	obj2 := objects.New()
+	obj2 := object.New()
 	if obj1.ID() == obj2.ID() {
 		t.Error("IDs not incremented properly")
 		return
@@ -37,7 +37,7 @@ func TestNewObject(t *testing.T) {
 }
 
 func TestBaseObject_AddComponents(t *testing.T) {
-	obj1 := objects.New()
+	obj1 := object.New()
 	if obj1.HasComponent(components.PlayerControlName) {
 		t.Error("object has component before adding")
 		return
@@ -59,7 +59,7 @@ func TestBaseObject_AddComponents(t *testing.T) {
 }
 
 func TestBaseObject_RemoveComponent(t *testing.T) {
-	obj1 := objects.New(&components.Drawable{})
+	obj1 := object.New(&components.Drawable{})
 	if !obj1.HasComponent(components.DrawableName) {
 		t.Error("component not added")
 		return
@@ -78,7 +78,7 @@ func TestBaseObject_GetComponent(t *testing.T) {
 		X: 123,
 		Y: 14,
 	}
-	obj1 := objects.New(playerControl, pos)
+	obj1 := object.New(playerControl, pos)
 
 	if p2 := obj1.GetComponent(components.PositionName).(*components.Position); pos != p2 {
 		t.Error("wrong component returned")
