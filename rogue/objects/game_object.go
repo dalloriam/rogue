@@ -9,9 +9,6 @@ var (
 type GameObject interface {
 	ID() uint64
 
-	AppendChild(child GameObject)
-	SetParent(parent GameObject)
-
 	AddComponents(c ...Component)
 	HasComponent(componentName string) bool
 	GetComponent(componentName string) Component
