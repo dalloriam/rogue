@@ -8,24 +8,24 @@ import (
 	"github.com/dalloriam/rogue/rogue/object"
 )
 
-type Camera interface {
+type Viewport interface {
 	Move(x, y int)
 	SetZoom(amount float64)
 }
 
-type CameraSystem struct {
-	cam Camera
+type ViewportSystem struct {
+	cam Viewport
 }
 
-func NewCameraSystem(camera Camera) *CameraSystem {
-	return &CameraSystem{cam: camera}
+func NewViewportSystem(camera Viewport) *ViewportSystem {
+	return &ViewportSystem{cam: camera}
 }
 
-func (c *CameraSystem) ShouldTrack(object object.GameObject) bool {
+func (c *ViewportSystem) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.FocusName) && object.HasComponent(components.PositionName)
 }
 
-func (c *CameraSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
+func (c *ViewportSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
 	var bestX, bestY int
 	highestPriority := -1
 	punctual := false

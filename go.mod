@@ -11,6 +11,7 @@ require (
 	github.com/go-gl/mathgl v0.0.0-20190713194549-592312d8590a // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/pkg/errors v0.8.1 // indirect
+	github.com/purposed/good v1.0.0
 	go.uber.org/atomic v1.4.0
 	golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a
 )

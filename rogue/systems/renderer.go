@@ -57,6 +57,10 @@ func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects ma
 	for i := 0; i < len(worldMap); i++ {
 		for j := 0; j < len(worldMap[i]); j++ {
 			currentTile := worldMap[i][j]
+			if !currentTile.Visible {
+				continue
+			}
+
 			// When drawing the tiles initially, we have no clue if we have an entity at this position.
 			// First, what we know for sure is that we need to draw the map tile background.
 			r.engine.Rectangle(i, j, currentTile.BgColor)

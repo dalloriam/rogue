@@ -8,6 +8,8 @@ type Tile struct {
 
 	Type string // TODO: Find better way of representing tile type.
 
+	Visible bool
+
 	Char    rune
 	FgColor color.Color
 	BgColor color.Color
@@ -37,8 +39,8 @@ func (m Map) SizeY() int {
 	return len(m[0])
 }
 
-func (m Map) At(x, y int) Tile {
-	return m[x][y]
+func (m Map) At(x, y int) *Tile {
+	return &m[x][y]
 }
 
 func (m Map) Set(tile Tile) {

@@ -1,22 +1,15 @@
 package components
 
+import "github.com/purposed/good/datastructure/stringset"
+
 const (
 	PhysicsName = "physics"
 )
 
 type Physics struct {
-	BlockedBy []string
+	BlockedBy stringset.StringSet
 }
 
 func (p *Physics) Name() string {
 	return PhysicsName
-}
-
-func (p *Physics) IsBlocked(tileType string) bool {
-	for _, t := range p.BlockedBy {
-		if t == tileType {
-			return true
-		}
-	}
-	return false
 }
