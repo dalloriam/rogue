@@ -3,6 +3,8 @@ package components_test
 import (
 	"testing"
 
+	"github.com/purposed/good/datastructure/stringset"
+
 	"github.com/dalloriam/rogue/rogue/components"
 )
 
@@ -14,14 +16,14 @@ func TestPhysics_Name(t *testing.T) {
 }
 
 func TestPhysics_IsBlocked(t *testing.T) {
-	d := &components.Physics{BlockedBy: []string{"wall"}}
+	d := &components.Physics{BlockedBy: stringset.FromValues([]string{"wall"})}
 
-	if !d.IsBlocked("wall") {
+	if !d.BlockedBy.Contains("wall") {
 		t.Error("expected physics component to be blocked by wall")
 		return
 	}
 
-	if d.IsBlocked("floor") {
+	if d.BlockedBy.Contains("floor") {
 		t.Error("did not expect physics component to be blocked by floor")
 		return
 	}
