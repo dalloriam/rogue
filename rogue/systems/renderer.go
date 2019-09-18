@@ -14,26 +14,19 @@ type RenderingEngine interface {
 	Clear()
 	Draw()
 
-	Rectangle(startX, startY, endX, endY int, bgColor color.Color)
-	Text(startX, startY int, text string, fgColor color.Color)
-}
-
-type RendererOptions struct {
-	TileSizeX int
-	TileSizeY int
+	Rectangle(x, y int, bgColor color.Color)
+	Text(x, y int, text string, fgColor color.Color)
 }
 
 // A Renderer renders components.
 type Renderer struct {
 	engine RenderingEngine
-	opt    RendererOptions
 }
 
 // NewRenderer returns a new rendering system.
-func NewRenderer(engine RenderingEngine, opt RendererOptions) (*Renderer, error) {
+func NewRenderer(engine RenderingEngine) (*Renderer, error) {
 	return &Renderer{
 		engine: engine,
-		opt:    opt,
 	}, nil
 }
 
@@ -66,21 +59,19 @@ func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects ma
 			currentTile := worldMap[i][j]
 			// When drawing the tiles initially, we have no clue if we have an entity at this position.
 			// First, what we know for sure is that we need to draw the map tile background.
-			startX := currentTile.X * r.opt.TileSizeX
-			startY := currentTile.Y * r.opt.TileSizeY
-			r.engine.Rectangle(startX, startY, startX+r.opt.TileSizeX, startY+r.opt.TileSizeY, currentTile.BgColor)
+			r.engine.Rectangle(i, j, currentTile.BgColor)
 
 			// Once we have the tile background, we need to check if we have an object on this tile.
 			// If so, we'll draw the object (Bg & Fg), otherwise we'll draw the tile foreground.
 			if objectMap[currentTile.X][currentTile.Y] == 0 {
 				// We don't have an entity. Proceed with the foreground
-				r.engine.Text(startX, startY, string([]rune{currentTile.Char}), currentTile.FgColor)
+				r.engine.Text(i, j, string([]rune{currentTile.Char}), currentTile.FgColor)
 			} else {
 				// We have an object. First, draw its background (if it's not transparent).
 				// TODO: Perform this check *before* rendering the tile background to save a drawing call.
 				drawable := objects[objectMap[i][j]].GetComponent(components.DrawableName).(*components.Drawable)
-				r.engine.Rectangle(startX, startY, startX+r.opt.TileSizeX, startY+r.opt.TileSizeY, drawable.BgColor)
-				r.engine.Text(startX, startY, string([]rune{drawable.Char}), drawable.FgColor)
+				r.engine.Rectangle(i, j, drawable.BgColor)
+				r.engine.Text(i, j, string([]rune{drawable.Char}), drawable.FgColor)
 			}
 		}
 	}

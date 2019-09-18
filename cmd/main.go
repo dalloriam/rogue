@@ -40,6 +40,9 @@ func pixelRun() {
 		FontFacePath: "data/font.ttf",
 		FontSize:     19,
 
+		TileHeight: 25,
+		TileWidth:  25,
+
 		WindowTitle: "Rogue Demo",
 		WindowSizeX: 1300,
 		WindowSizeY: 900,
@@ -51,13 +54,7 @@ func pixelRun() {
 	if err != nil {
 		panic(err)
 	}
-
-	// Creating system from rogue renderer.
-	renderOpt := systems.RendererOptions{
-		TileSizeX: 25,
-		TileSizeY: 25,
-	}
-	renderingSystem, err := systems.NewRenderer(r, renderOpt)
+	renderingSystem, err := systems.NewRenderer(r)
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +69,7 @@ func pixelRun() {
 		10,
 		6,
 		20,
-		int(float64(opt.WindowSizeX)/float64(renderOpt.TileSizeX)), int(float64(opt.WindowSizeY)/float64(renderOpt.TileSizeY)),
+		int(float64(opt.WindowSizeX)/float64(opt.TileWidth)), int(float64(opt.WindowSizeY)/float64(opt.TileHeight)),
 	)
 
 	lvlManager := cartography.NewLevelManager("test.txt", time.Now().UnixNano())
