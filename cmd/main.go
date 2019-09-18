@@ -50,8 +50,8 @@ func pixelRun() {
 		SmoothDrawing: true,
 		VSync:         true,
 	}
-	opt.MapWidth = int(float64(opt.WindowSizeX) / float64(opt.TileWidth) * 1.2)
-	opt.MapHeight = int(float64(opt.WindowSizeY) / float64(opt.TileHeight) * 1.2)
+	opt.MapWidth = int(float64(opt.WindowSizeX) / float64(opt.TileWidth) * 2)
+	opt.MapHeight = int(float64(opt.WindowSizeY) / float64(opt.TileHeight) * 2)
 
 	r, err := roguepixel.NewRenderer(opt)
 	if err != nil {
@@ -65,7 +65,7 @@ func pixelRun() {
 	// Creating the world.
 	world := rogue.NewWorld()
 	world.AddSystem(renderingSystem, 1)
-	world.AddSystem(systems.NewMovementSystem(), 2)
+	world.AddSystem(systems.NewMovementSystem(), 3)
 	world.AddSystem(systems.NewControllerSystem(roguepixel.NewInputHandler(r.Window)), 999)
 	world.AddSystem(systems.NewCameraSystem(r.GetCamera()), 2)
 
