@@ -9,7 +9,8 @@ import (
 )
 
 type Camera interface {
-	MoveTo(x, y int)
+	Move(x, y int)
+	SetZoom(amount float64)
 }
 
 type CameraSystem struct {
@@ -27,6 +28,8 @@ func (c *CameraSystem) ShouldTrack(object object.GameObject) bool {
 func (c *CameraSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
 	var bestX, bestY int
 	highestPriority := -1
+	punctual := false
+	var bestObject object.GameObject
 
 	for _, obj := range objects {
 		focusTgt := obj.GetComponent(components.FocusName).(*components.Focus)
@@ -35,11 +38,17 @@ func (c *CameraSystem) Update(dT time.Duration, worldMap cartography.Map, object
 		if focusTgt.Priority > highestPriority {
 			bestX = position.X
 			bestY = position.Y
+			bestObject = obj
+			punctual = focusTgt.Punctual
 		}
 	}
 
 	// TODO: Do tile size conversion.
-	c.cam.MoveTo(bestX, bestY)
+	c.cam.Move(bestX, bestY)
+
+	if punctual && bestObject != nil {
+		bestObject.RemoveComponent(components.FocusName)
+	}
 
 	return nil
 }

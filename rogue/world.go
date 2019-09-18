@@ -54,7 +54,7 @@ func (w *World) AddSystem(sys systems.System, priority int) {
 		sysColl = append(sysColl, system)
 	}
 	sort.Slice(sysColl, func(i, j int) bool {
-		return w.systemPriorities[sysColl[i]] < w.systemPriorities[sysColl[j]]
+		return w.systemPriorities[sysColl[i]] >= w.systemPriorities[sysColl[j]]
 	})
 	w.systems = sysColl
 }

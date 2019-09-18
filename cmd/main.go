@@ -50,6 +50,9 @@ func pixelRun() {
 		SmoothDrawing: true,
 		VSync:         true,
 	}
+	opt.MapWidth = int(float64(opt.WindowSizeX) / float64(opt.TileWidth) * 1.2)
+	opt.MapHeight = int(float64(opt.WindowSizeY) / float64(opt.TileHeight) * 1.2)
+
 	r, err := roguepixel.NewRenderer(opt)
 	if err != nil {
 		panic(err)
@@ -64,12 +67,14 @@ func pixelRun() {
 	world.AddSystem(renderingSystem, 1)
 	world.AddSystem(systems.NewMovementSystem(), 2)
 	world.AddSystem(systems.NewControllerSystem(roguepixel.NewInputHandler(r.Window)), 999)
+	world.AddSystem(systems.NewCameraSystem(r.GetCamera()), 2)
 
 	gen := generator.NewDungeonGenerator(
 		10,
 		6,
 		20,
-		int(float64(opt.WindowSizeX)/float64(opt.TileWidth)), int(float64(opt.WindowSizeY)/float64(opt.TileHeight)),
+		opt.MapWidth,
+		opt.MapHeight,
 	)
 
 	lvlManager := cartography.NewLevelManager("test.txt", time.Now().UnixNano())
@@ -94,6 +99,10 @@ func pixelRun() {
 		},
 		&components.Physics{BlockedBy: []string{"wall"}},
 		&components.PlayerControl{},
+		&components.Focus{
+			Priority: 0,
+			Punctual: false,
+		},
 	)
 	world.AddObject(player)
 

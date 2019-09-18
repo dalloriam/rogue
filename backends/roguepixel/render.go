@@ -22,8 +22,11 @@ type GridRenderOptions struct {
 
 	// Window-related settings.
 	WindowTitle string
-	WindowSizeX uint64
-	WindowSizeY uint64
+	WindowSizeX int
+	WindowSizeY int
+
+	MapWidth  int
+	MapHeight int
 
 	// Advanced Settings
 	SmoothDrawing bool
@@ -37,6 +40,8 @@ type GridRenderer struct {
 
 	imd        *imdraw.IMDraw
 	textDrawer *text.Text
+
+	camera *Camera
 }
 
 // NewRenderer initializes and returns a new pixel renderer in the specified window.
@@ -59,6 +64,7 @@ func NewRenderer(opt GridRenderOptions) (*GridRenderer, error) {
 		opt:    opt,
 		imd:    imdraw.New(win),
 		Window: win,
+		camera: NewCamera(opt.TileWidth, opt.TileHeight, opt.MapWidth, opt.MapHeight, opt.WindowSizeX, opt.WindowSizeY),
 	}
 
 	// Load the main font.
@@ -71,6 +77,10 @@ func NewRenderer(opt GridRenderOptions) (*GridRenderer, error) {
 	r.textDrawer = text.New(pixel.V(0, 0), atlas)
 
 	return &r, nil
+}
+
+func (r *GridRenderer) GetCamera() *Camera {
+	return r.camera
 }
 
 func (r *GridRenderer) getFontAtlas() (*text.Atlas, error) {
@@ -113,6 +123,9 @@ func (r *GridRenderer) Clear() {
 }
 
 func (r *GridRenderer) Draw() {
+	cam := pixel.IM.Scaled(r.camera.Position, r.camera.Zoom).Moved(r.Window.Bounds().Center().Sub(r.camera.Position))
+	r.Window.SetMatrix(cam)
+
 	r.imd.Draw(r.Window)
 	r.textDrawer.Draw(r.Window, pixel.IM)
 	r.Window.Update()
