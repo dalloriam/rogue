@@ -16,10 +16,17 @@ type GridRenderOptions struct {
 	FontFacePath string
 	FontSize     int
 
+	// Tiling settings.
+	TileWidth  int
+	TileHeight int
+
 	// Window-related settings.
 	WindowTitle string
-	WindowSizeX uint64
-	WindowSizeY uint64
+	WindowSizeX int
+	WindowSizeY int
+
+	MapWidth  int
+	MapHeight int
 
 	// Advanced Settings
 	SmoothDrawing bool
@@ -33,6 +40,8 @@ type GridRenderer struct {
 
 	imd        *imdraw.IMDraw
 	textDrawer *text.Text
+
+	camera *Camera
 }
 
 // NewRenderer initializes and returns a new pixel renderer in the specified window.
@@ -55,6 +64,7 @@ func NewRenderer(opt GridRenderOptions) (*GridRenderer, error) {
 		opt:    opt,
 		imd:    imdraw.New(win),
 		Window: win,
+		camera: NewCamera(opt.TileWidth, opt.TileHeight, opt.MapWidth, opt.MapHeight, opt.WindowSizeX, opt.WindowSizeY),
 	}
 
 	// Load the main font.
@@ -69,6 +79,10 @@ func NewRenderer(opt GridRenderOptions) (*GridRenderer, error) {
 	return &r, nil
 }
 
+func (r *GridRenderer) GetCamera() *Camera {
+	return r.camera
+}
+
 func (r *GridRenderer) getFontAtlas() (*text.Atlas, error) {
 	face, err := util.LoadTTF(r.opt.FontFacePath, float64(r.opt.FontSize))
 	if err != nil {
@@ -77,20 +91,20 @@ func (r *GridRenderer) getFontAtlas() (*text.Atlas, error) {
 	return text.NewAtlas(face, text.ASCII), nil
 }
 
-func (r *GridRenderer) Rectangle(startX, startY, endX, endY int, bgColor color.Color) {
+func (r *GridRenderer) Rectangle(x, y int, bgColor color.Color) {
 	r.imd.Color = bgColor
 
-	origin := pixel.V(float64(startX), float64(startY))
+	origin := pixel.V(float64(x*r.opt.TileWidth), float64(y*r.opt.TileHeight))
 	r.imd.Push(origin)
 
-	dst := pixel.V(float64(endX), float64(endY))
+	dst := origin.Add(pixel.V(float64(r.opt.TileWidth), float64(r.opt.TileHeight)))
 	r.imd.Push(dst)
 	r.imd.Rectangle(0)
 }
 
-func (r *GridRenderer) Text(startX, startY int, text string, fgColor color.Color) {
+func (r *GridRenderer) Text(x, y int, text string, fgColor color.Color) {
 	r.textDrawer.Color = fgColor
-	r.textDrawer.Dot = pixel.V(float64(startX), float64(startY))
+	r.textDrawer.Dot = pixel.V(float64(x*r.opt.TileWidth), float64(y*r.opt.TileHeight))
 	r.textDrawer.Dot.X += r.textDrawer.BoundsOf(text).W() * 0.8 / 2
 	r.textDrawer.Dot.Y += r.textDrawer.BoundsOf(text).H() * 0.8 / 2
 	if _, err := fmt.Fprint(r.textDrawer, text); err != nil {
@@ -109,6 +123,9 @@ func (r *GridRenderer) Clear() {
 }
 
 func (r *GridRenderer) Draw() {
+	cam := pixel.IM.Scaled(r.camera.Position, r.camera.Zoom).Moved(r.Window.Bounds().Center().Sub(r.camera.Position))
+	r.Window.SetMatrix(cam)
+
 	r.imd.Draw(r.Window)
 	r.textDrawer.Draw(r.Window, pixel.IM)
 	r.Window.Update()

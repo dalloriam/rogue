@@ -9,7 +9,7 @@ import (
 	"github.com/dalloriam/rogue/cmd/generator"
 
 	"github.com/dalloriam/rogue/rogue/components"
-	"github.com/dalloriam/rogue/rogue/objects"
+	"github.com/dalloriam/rogue/rogue/object"
 
 	"github.com/dalloriam/rogue/rogue/systems"
 
@@ -40,6 +40,9 @@ func pixelRun() {
 		FontFacePath: "data/font.ttf",
 		FontSize:     19,
 
+		TileHeight: 25,
+		TileWidth:  25,
+
 		WindowTitle: "Rogue Demo",
 		WindowSizeX: 1300,
 		WindowSizeY: 900,
@@ -47,17 +50,14 @@ func pixelRun() {
 		SmoothDrawing: true,
 		VSync:         true,
 	}
+	opt.MapWidth = int(float64(opt.WindowSizeX) / float64(opt.TileWidth) * 2)
+	opt.MapHeight = int(float64(opt.WindowSizeY) / float64(opt.TileHeight) * 2)
+
 	r, err := roguepixel.NewRenderer(opt)
 	if err != nil {
 		panic(err)
 	}
-
-	// Creating system from rogue renderer.
-	renderOpt := systems.RendererOptions{
-		TileSizeX: 25,
-		TileSizeY: 25,
-	}
-	renderingSystem, err := systems.NewRenderer(r, renderOpt)
+	renderingSystem, err := systems.NewRenderer(r)
 	if err != nil {
 		panic(err)
 	}
@@ -65,14 +65,16 @@ func pixelRun() {
 	// Creating the world.
 	world := rogue.NewWorld()
 	world.AddSystem(renderingSystem, 1)
-	world.AddSystem(systems.NewMovementSystem(), 2)
+	world.AddSystem(systems.NewMovementSystem(), 3)
 	world.AddSystem(systems.NewControllerSystem(roguepixel.NewInputHandler(r.Window)), 999)
+	world.AddSystem(systems.NewCameraSystem(r.GetCamera()), 2)
 
 	gen := generator.NewDungeonGenerator(
 		10,
 		6,
 		20,
-		int(float64(opt.WindowSizeX)/float64(renderOpt.TileSizeX)), int(float64(opt.WindowSizeY)/float64(renderOpt.TileSizeY)),
+		opt.MapWidth,
+		opt.MapHeight,
 	)
 
 	lvlManager := cartography.NewLevelManager("test.txt", time.Now().UnixNano())
@@ -85,7 +87,7 @@ func pixelRun() {
 
 	playerX, playerY := findPlayer(lvl)
 
-	player := objects.New(
+	player := object.New(
 		&components.Drawable{
 			Char:    '@',
 			FgColor: color.White,
@@ -97,6 +99,10 @@ func pixelRun() {
 		},
 		&components.Physics{BlockedBy: []string{"wall"}},
 		&components.PlayerControl{},
+		&components.Focus{
+			Priority: 0,
+			Punctual: false,
+		},
 	)
 	world.AddObject(player)
 

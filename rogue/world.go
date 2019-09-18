@@ -10,7 +10,7 @@ import (
 
 	"github.com/dalloriam/rogue/rogue/systems"
 
-	"github.com/dalloriam/rogue/rogue/objects"
+	"github.com/dalloriam/rogue/rogue/object"
 )
 
 // World represents the root World.
@@ -18,7 +18,7 @@ type World struct {
 	systemPriorities map[*systems.GameSystem]int
 	systems          []*systems.GameSystem
 
-	objects map[uint64]objects.GameObject
+	objects map[uint64]object.GameObject
 
 	lastTick  time.Time
 	turnClock *gameplay.TurnClock
@@ -30,7 +30,7 @@ type World struct {
 func NewWorld() *World {
 	return &World{
 		systemPriorities: make(map[*systems.GameSystem]int),
-		objects:          make(map[uint64]objects.GameObject),
+		objects:          make(map[uint64]object.GameObject),
 		lastTick:         time.Now(),
 	}
 }
@@ -39,7 +39,7 @@ func (w *World) LoadMap(m cartography.Map) {
 	w.worldMap = m
 }
 
-func (w *World) AddObject(object objects.GameObject) {
+func (w *World) AddObject(object object.GameObject) {
 	// Add the object to the main registry.
 	w.objects[object.ID()] = object
 }
@@ -54,7 +54,7 @@ func (w *World) AddSystem(sys systems.System, priority int) {
 		sysColl = append(sysColl, system)
 	}
 	sort.Slice(sysColl, func(i, j int) bool {
-		return w.systemPriorities[sysColl[i]] < w.systemPriorities[sysColl[j]]
+		return w.systemPriorities[sysColl[i]] >= w.systemPriorities[sysColl[j]]
 	})
 	w.systems = sysColl
 }
