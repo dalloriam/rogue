@@ -10,10 +10,14 @@ import (
 
 type InputProvider interface {
 	GetDirection() cartography.Direction
+
+	RepeatModeTriggered() bool
 }
 
 type ControllerSystem struct {
 	provider InputProvider
+
+	isInRepeatMode bool
 }
 
 func NewControllerSystem(provider InputProvider) *ControllerSystem {
@@ -27,9 +31,17 @@ func (c *ControllerSystem) ShouldTrack(object object.GameObject) bool {
 }
 
 func (c *ControllerSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
-	dir := c.provider.GetDirection()
+	currentDirection := c.provider.GetDirection()
 	for _, obj := range objects {
-		obj.AddComponents(&components.Movement{Direction: dir})
+		// If a direction key is pressed, prioritize it and cancel repeat mode.
+		if currentDirection != cartography.NoDirection {
+			obj.AddComponents(&components.Movement{Direction: currentDirection})
+			c.isInRepeatMode = false
+		} else if c.provider.RepeatModeTriggered() {
+			c.isInRepeatMode = true
+		} else if c.isInRepeatMode {
+
+		}
 	}
 	return nil
 }
