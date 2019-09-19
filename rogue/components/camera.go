@@ -1,7 +1,7 @@
 package components
 
 import (
-	"github.com/dalloriam/rogue/rogue/cartography"
+	"github.com/dalloriam/rogue/rogue/structure"
 	"github.com/purposed/good/datastructure/stringset"
 )
 
@@ -12,7 +12,7 @@ const (
 // Camera represents an observer.
 type Camera struct {
 	SightRadius int
-	Memory      cartography.Map
+	Memory      []structure.Vec
 
 	BlockedBy stringset.StringSet
 }

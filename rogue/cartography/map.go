@@ -8,7 +8,7 @@ type Tile struct {
 
 	Type string // TODO: Find better way of representing tile type.
 
-	Visible bool
+	Visibility float64 // 0.0 is invisible, 1.0 is fully lit.
 
 	Char    rune
 	FgColor color.Color
