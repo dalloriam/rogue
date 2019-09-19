@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/dalloriam/rogue/rogue/structure"
+
 	"github.com/dalloriam/rogue/rogue/cartography"
 )
 
@@ -13,12 +15,11 @@ type mockTemplate struct{}
 func (m *mockTemplate) Generate(source *rand.Rand) cartography.Map {
 	lvlMap := cartography.NewMap(1, 1)
 	lvlMap.Set(cartography.Tile{
-		X:       0,
-		Y:       0,
-		Char:    'w',
-		Type:    fmt.Sprintf("%d", source.Int()),
-		FgColor: nil,
-		BgColor: nil,
+		Position: structure.V(0, 0),
+		Char:     'w',
+		Type:     fmt.Sprintf("%d", source.Int()),
+		FgColor:  nil,
+		BgColor:  nil,
 	})
 	return lvlMap
 }
@@ -38,7 +39,7 @@ func TestLevelManager_Generation(t *testing.T) {
 			return
 		}
 
-		if tile := lvl.At(0, 0); tile.Char != 'w' {
+		if tile := lvl.At(structure.V(0, 0)); tile.Char != 'w' {
 			t.Error("invalid tile character")
 		}
 	} else {
@@ -55,9 +56,9 @@ func TestLevelManager_Seeding(t *testing.T) {
 	l2 := m2.AddLevel("other_level", &mockTemplate{})
 	l3 := m3.AddLevel("yet_other_level", &mockTemplate{})
 
-	t1 := l1.At(0, 0)
-	t2 := l2.At(0, 0)
-	t3 := l3.At(0, 0)
+	t1 := l1.At(structure.V(0, 0))
+	t2 := l2.At(structure.V(0, 0))
+	t3 := l3.At(structure.V(0, 0))
 
 	if (t1.Type != t2.Type) || (t1.Type == t3.Type) || (t2.Type == t3.Type) {
 		t.Error("invalid seeding")
