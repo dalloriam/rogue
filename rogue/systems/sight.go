@@ -74,7 +74,7 @@ func (s *SightSystem) Update(dT time.Duration, worldMap cartography.Map, objects
 		// Override tile memory
 		for _, tileVec := range cam.Memory {
 			if t := worldMap.At(tileVec.X, tileVec.Y); t.Visibility == 0.0 {
-				t.Visibility = 0.25
+				t.Visibility = 0.25 // TODO: Store somewhere
 			}
 		}
 	}

@@ -38,6 +38,18 @@ func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, obje
 			newPosition.X--
 		case cartography.DirectionRight:
 			newPosition.X++
+		case cartography.DirectionDownRight:
+			newPosition.X++
+			newPosition.Y--
+		case cartography.DirectionDownLeft:
+			newPosition.X--
+			newPosition.Y--
+		case cartography.DirectionUpRight:
+			newPosition.X++
+			newPosition.Y++
+		case cartography.DirectionUpLeft:
+			newPosition.X--
+			newPosition.Y++
 		}
 
 		object.RemoveComponent(components.MovementName)
