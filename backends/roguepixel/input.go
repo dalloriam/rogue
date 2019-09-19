@@ -33,5 +33,21 @@ func (i *InputHandler) GetDirection() cartography.Direction {
 		return cartography.DirectionLeft
 	}
 
+	if i.window.JustPressed(pixelgl.KeyN) {
+		return cartography.DirectionDownRight
+	}
+
+	if i.window.JustPressed(pixelgl.KeyB) {
+		return cartography.DirectionDownLeft
+	}
+
+	if i.window.JustPressed(pixelgl.KeyY) {
+		return cartography.DirectionUpLeft
+	}
+
+	if i.window.JustPressed(pixelgl.KeyU) {
+		return cartography.DirectionUpRight
+	}
+
 	return cartography.NoDirection
 }
