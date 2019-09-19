@@ -73,12 +73,12 @@ func (g *DungeonGenerator) digRectangle(r Rectangle) {
 }
 
 func (g *DungeonGenerator) digVerticalTunnel(startY, endY, x int) {
-	for y := math.Min(float64(startY), float64(endY)); y < math.Max(float64(startY), float64(endY)); y++ {
+	for y := math.Min(float64(startY), float64(endY)); y <= math.Max(float64(startY), float64(endY)); y++ {
 		g.levelMap.Set(tiles.RockFloor(x, int(y)))
 	}
 }
 func (g *DungeonGenerator) digHorizontalTunnel(startX, endX, y int) {
-	for x := math.Min(float64(startX), float64(endX)); x < math.Max(float64(startX), float64(endX)); x++ {
+	for x := math.Min(float64(startX), float64(endX)); x <= math.Max(float64(startX), float64(endX)); x++ {
 		g.levelMap.Set(tiles.RockFloor(int(x), y))
 	}
 }

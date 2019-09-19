@@ -1,10 +1,13 @@
 package cartography
 
-import "image/color"
+import (
+	"image/color"
+
+	"github.com/dalloriam/rogue/rogue/structure"
+)
 
 type Tile struct {
-	X int
-	Y int
+	Position structure.Vec
 
 	Type string // TODO: Find better way of representing tile type.
 
@@ -39,10 +42,10 @@ func (m Map) SizeY() int {
 	return len(m[0])
 }
 
-func (m Map) At(x, y int) *Tile {
-	return &m[x][y]
+func (m Map) At(position structure.Vec) *Tile {
+	return &m[position.X()][position.Y()]
 }
 
 func (m Map) Set(tile Tile) {
-	m[tile.X][tile.Y] = tile
+	m[tile.Position.X()][tile.Position.Y()] = tile
 }

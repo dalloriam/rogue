@@ -3,6 +3,8 @@ package object_test
 import (
 	"testing"
 
+	"github.com/dalloriam/rogue/rogue/structure"
+
 	"github.com/dalloriam/rogue/rogue/components"
 
 	"github.com/dalloriam/rogue/rogue/object"
@@ -10,8 +12,7 @@ import (
 
 func TestNewObject(t *testing.T) {
 	obj1 := object.New(&components.PlayerControl{}, &components.Position{
-		X: 0,
-		Y: 0,
+		Vec: structure.V(0, 0),
 	})
 
 	if obj1.ID() != uint64(1) {
@@ -75,8 +76,7 @@ func TestBaseObject_RemoveComponent(t *testing.T) {
 func TestBaseObject_GetComponent(t *testing.T) {
 	playerControl := &components.PlayerControl{}
 	pos := &components.Position{
-		X: 123,
-		Y: 14,
+		Vec: structure.V(123, 14),
 	}
 	obj1 := object.New(playerControl, pos)
 

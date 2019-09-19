@@ -3,6 +3,8 @@ package main
 import (
 	"time"
 
+	"github.com/dalloriam/rogue/rogue/structure"
+
 	"github.com/dalloriam/rogue/cmd/entities"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
@@ -23,7 +25,7 @@ func findPlayer(level cartography.Map) (int, int) {
 	// TODO: Improve randomness of player position.
 	for i := 0; i < level.SizeX(); i++ {
 		for j := 0; j < level.SizeY(); j++ {
-			if level.At(i, j).Type == "floor" {
+			if level.At(structure.V(i, j)).Type == "floor" {
 				return i, j
 			}
 		}
@@ -48,8 +50,8 @@ func pixelRun() {
 		SmoothDrawing: true,
 		VSync:         true,
 	}
-	opt.MapWidth = int(float64(opt.WindowSizeX) / float64(opt.TileWidth) * 2)
-	opt.MapHeight = int(float64(opt.WindowSizeY) / float64(opt.TileHeight) * 2)
+	opt.MapWidth = int(float64(opt.WindowSizeX) / float64(opt.TileWidth) * 1.0)
+	opt.MapHeight = int(float64(opt.WindowSizeY) / float64(opt.TileHeight) * 1.0)
 
 	r, err := roguepixel.NewRenderer(opt)
 	if err != nil {
@@ -64,7 +66,7 @@ func pixelRun() {
 	world := rogue.NewWorld()
 	world.AddSystem(renderingSystem, 1)
 	world.AddSystem(systems.NewViewportSystem(r.GetCamera()), 2)
-	world.AddSystem(systems.NewSightSystem(), 2)
+	world.AddSystem(systems.NewSightSystem(1.0), 2)
 	world.AddSystem(systems.NewMovementSystem(), 3)
 	world.AddSystem(systems.NewControllerSystem(roguepixel.NewInputHandler(r.Window)), 999)
 
@@ -76,7 +78,9 @@ func pixelRun() {
 		opt.MapHeight,
 	)
 
-	lvlManager := cartography.NewLevelManager("test.txt", time.Now().UnixNano())
+	var seed int64
+	seed = time.Now().UnixNano()
+	lvlManager := cartography.NewLevelManager("test.txt", seed)
 	lvlManager.AddLevel("dungeon_1", gen)
 	lvl, ok := lvlManager.GetLevel("dungeon_1")
 	if !ok {
