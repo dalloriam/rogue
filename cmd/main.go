@@ -50,8 +50,8 @@ func pixelRun() {
 		SmoothDrawing: true,
 		VSync:         true,
 	}
-	opt.MapWidth = int(float64(opt.WindowSizeX) / float64(opt.TileWidth) * 2)
-	opt.MapHeight = int(float64(opt.WindowSizeY) / float64(opt.TileHeight) * 2)
+	opt.MapWidth = int(float64(opt.WindowSizeX) / float64(opt.TileWidth) * 1.0)
+	opt.MapHeight = int(float64(opt.WindowSizeY) / float64(opt.TileHeight) * 1.0)
 
 	r, err := roguepixel.NewRenderer(opt)
 	if err != nil {
@@ -66,7 +66,7 @@ func pixelRun() {
 	world := rogue.NewWorld()
 	world.AddSystem(renderingSystem, 1)
 	world.AddSystem(systems.NewViewportSystem(r.GetCamera()), 2)
-	world.AddSystem(systems.NewSightSystem(), 2)
+	world.AddSystem(systems.NewSightSystem(1.0), 2)
 	world.AddSystem(systems.NewMovementSystem(), 3)
 	world.AddSystem(systems.NewControllerSystem(roguepixel.NewInputHandler(r.Window)), 999)
 
@@ -78,7 +78,9 @@ func pixelRun() {
 		opt.MapHeight,
 	)
 
-	lvlManager := cartography.NewLevelManager("test.txt", time.Now().UnixNano())
+	var seed int64
+	seed = time.Now().UnixNano()
+	lvlManager := cartography.NewLevelManager("test.txt", seed)
 	lvlManager.AddLevel("dungeon_1", gen)
 	lvl, ok := lvlManager.GetLevel("dungeon_1")
 	if !ok {

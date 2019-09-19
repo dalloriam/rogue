@@ -1,6 +1,9 @@
 package cartography
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+)
 
 // A LevelTemplate implements logic for generating a single level (or "floor").
 type LevelTemplate interface {
@@ -16,6 +19,7 @@ type LevelManager struct {
 
 func NewLevelManager(levelFilePath string, seed int64) *LevelManager {
 	src := rand.NewSource(seed)
+	fmt.Printf("Seed: %d\n", seed)
 	return &LevelManager{
 		filePath:     levelFilePath,
 		levels:       make(map[string]Map),

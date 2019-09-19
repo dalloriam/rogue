@@ -14,13 +14,16 @@ import (
 type SightSystem struct {
 	RayCount int
 	RayStep  int
+
+	DefaultVisibility float64
 }
 
-func NewSightSystem() *SightSystem {
+func NewSightSystem(defaultVisibility float64) *SightSystem {
 	// TODO: Extract constants.
 	return &SightSystem{
-		RayCount: 360,
-		RayStep:  3,
+		RayCount:          360,
+		RayStep:           3,
+		DefaultVisibility: defaultVisibility,
 	}
 }
 
@@ -33,7 +36,7 @@ func (s *SightSystem) Update(dT time.Duration, worldMap cartography.Map, objects
 	// Make all tiles invisible.
 	for i := 0; i < len(worldMap); i++ {
 		for j := 0; j < len(worldMap[i]); j++ {
-			worldMap.At(structure.V(i, j)).Visibility = 0.0
+			worldMap.At(structure.V(i, j)).Visibility = s.DefaultVisibility
 		}
 	}
 
