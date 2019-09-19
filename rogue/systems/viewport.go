@@ -3,6 +3,8 @@ package systems
 import (
 	"time"
 
+	"github.com/dalloriam/rogue/rogue/structure"
+
 	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/object"
@@ -26,7 +28,7 @@ func (c *ViewportSystem) ShouldTrack(object object.GameObject) bool {
 }
 
 func (c *ViewportSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
-	var bestX, bestY int
+	var bestPos structure.Vec
 	highestPriority := -1
 	punctual := false
 	var bestObject object.GameObject
@@ -36,15 +38,14 @@ func (c *ViewportSystem) Update(dT time.Duration, worldMap cartography.Map, obje
 		position := obj.GetComponent(components.PositionName).(*components.Position)
 
 		if focusTgt.Priority > highestPriority {
-			bestX = position.X
-			bestY = position.Y
+			bestPos = position
 			bestObject = obj
 			punctual = focusTgt.Punctual
 		}
 	}
 
 	// TODO: Do tile size conversion.
-	c.cam.Move(bestX, bestY)
+	c.cam.Move(bestPos.X(), bestPos.Y())
 
 	if punctual && bestObject != nil {
 		bestObject.RemoveComponent(components.FocusName)

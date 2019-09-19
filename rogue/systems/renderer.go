@@ -75,7 +75,7 @@ func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects ma
 	}
 	for _, obj := range objects {
 		position := obj.GetComponent(components.PositionName).(*components.Position)
-		objectMap[position.X][position.Y] = obj.ID()
+		objectMap[position.X()][position.Y()] = obj.ID()
 	}
 
 	// Phase 1 - Draw cartography changes (TODO: Take viewport into account?)
@@ -92,7 +92,7 @@ func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects ma
 
 			// Once we have the tile background, we need to check if we have an object on this tile.
 			// If so, we'll draw the object (Bg & Fg), otherwise we'll draw the tile foreground.
-			if objectMap[currentTile.X][currentTile.Y] == 0 {
+			if objectMap[currentTile.Position.X()][currentTile.Position.Y()] == 0 {
 				// We don't have an entity. Proceed with the foreground
 				r.engine.Text(i, j, string([]rune{currentTile.Char}), r.shadeColor(currentTile.FgColor, currentTile.Visibility))
 			} else {

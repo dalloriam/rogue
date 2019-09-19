@@ -33,7 +33,7 @@ func (s *SightSystem) Update(dT time.Duration, worldMap cartography.Map, objects
 	// Make all tiles invisible.
 	for i := 0; i < len(worldMap); i++ {
 		for j := 0; j < len(worldMap[i]); j++ {
-			worldMap.At(i, j).Visibility = 0.0
+			worldMap.At(structure.V(i, j)).Visibility = 0.0
 		}
 	}
 
@@ -41,14 +41,14 @@ func (s *SightSystem) Update(dT time.Duration, worldMap cartography.Map, objects
 		pos := obj.GetComponent(components.PositionName).(*components.Position)
 		cam := obj.GetComponent(components.CameraName).(*components.Camera)
 
-		worldMap.At(pos.X, pos.Y).Visibility = 1.0 // Camera always sees its own tile.
+		worldMap.At(pos).Visibility = 1.0 // Camera always sees its own tile.
 
 		for i := 0; i < s.RayCount; i += s.RayStep {
 			ax := math.Cos(float64(i) / (180.0 / math.Pi))
 			ay := math.Sin(float64(i) / (180.0 / math.Pi))
 
-			x := float64(pos.X)
-			y := float64(pos.Y)
+			x := float64(pos.X())
+			y := float64(pos.Y())
 
 			for z := 0; z < cam.SightRadius; z++ {
 				x += ax
@@ -59,10 +59,10 @@ func (s *SightSystem) Update(dT time.Duration, worldMap cartography.Map, objects
 				}
 
 				// If we reach here, tile {x, y} is visible.
-				tile := worldMap.At(int(math.Round(x)), int(math.Round(y)))
+				tile := worldMap.At(structure.V(int(math.Round(x)), int(math.Round(y))))
 				tile.Visibility = 1.0
 
-				cam.Memory = append(cam.Memory, structure.V(tile.X, tile.Y))
+				cam.Memory = append(cam.Memory, tile.Position)
 
 				// However, if the current tile blocks sight, stop raytracing.
 				if cam.BlockedBy.Contains(tile.Type) {
@@ -73,7 +73,7 @@ func (s *SightSystem) Update(dT time.Duration, worldMap cartography.Map, objects
 
 		// Override tile memory
 		for _, tileVec := range cam.Memory {
-			if t := worldMap.At(tileVec.X, tileVec.Y); t.Visibility == 0.0 {
+			if t := worldMap.At(tileVec); t.Visibility == 0.0 {
 				t.Visibility = 0.25 // TODO: Store somewhere
 			}
 		}

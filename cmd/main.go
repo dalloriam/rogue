@@ -3,6 +3,8 @@ package main
 import (
 	"time"
 
+	"github.com/dalloriam/rogue/rogue/structure"
+
 	"github.com/dalloriam/rogue/cmd/entities"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
@@ -23,7 +25,7 @@ func findPlayer(level cartography.Map) (int, int) {
 	// TODO: Improve randomness of player position.
 	for i := 0; i < level.SizeX(); i++ {
 		for j := 0; j < level.SizeY(); j++ {
-			if level.At(i, j).Type == "floor" {
+			if level.At(structure.V(i, j)).Type == "floor" {
 				return i, j
 			}
 		}

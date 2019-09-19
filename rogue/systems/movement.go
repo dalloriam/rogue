@@ -3,6 +3,8 @@ package systems
 import (
 	"time"
 
+	"github.com/dalloriam/rogue/rogue/structure"
+
 	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/object"
@@ -24,40 +26,35 @@ func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, obje
 		movement := object.GetComponent(components.MovementName).(*components.Movement)
 		position := object.GetComponent(components.PositionName).(*components.Position)
 
-		newPosition := components.Position{
-			X: position.X,
-			Y: position.Y,
-		}
+		newPosition := components.Position{Vec: structure.V(position.X(), position.Y())}
+		displacement := structure.V(0, 0)
 
 		switch movement.Direction {
 		case cartography.DirectionUp:
-			newPosition.Y++
+			displacement = structure.V(0, 1)
 		case cartography.DirectionDown:
-			newPosition.Y--
+			displacement = structure.V(0, -1)
 		case cartography.DirectionLeft:
-			newPosition.X--
+			displacement = structure.V(-1, 0)
 		case cartography.DirectionRight:
-			newPosition.X++
+			displacement = structure.V(1, 0)
 		case cartography.DirectionDownRight:
-			newPosition.X++
-			newPosition.Y--
+			displacement = structure.V(1, -1)
 		case cartography.DirectionDownLeft:
-			newPosition.X--
-			newPosition.Y--
+			displacement = structure.V(-1, -1)
 		case cartography.DirectionUpRight:
-			newPosition.X++
-			newPosition.Y++
+			displacement = structure.V(1, 1)
 		case cartography.DirectionUpLeft:
-			newPosition.X--
-			newPosition.Y++
+			displacement = structure.V(-1, 1)
 		}
+		newPosition.Add(displacement)
 
 		object.RemoveComponent(components.MovementName)
 
 		// Check if the movement is blocked before triggering.
 		if object.HasComponent(components.PhysicsName) {
 			phys := object.GetComponent(components.PhysicsName).(*components.Physics)
-			tgtTile := worldMap.At(newPosition.X, newPosition.Y)
+			tgtTile := worldMap.At(newPosition)
 
 			if !phys.BlockedBy.Contains(tgtTile.Type) {
 				object.AddComponents(&newPosition)
