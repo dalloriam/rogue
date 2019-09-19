@@ -47,8 +47,7 @@ func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, obje
 			phys := object.GetComponent(components.PhysicsName).(*components.Physics)
 			tgtTile := worldMap.At(newPosition.X, newPosition.Y)
 
-			if !phys.IsBlocked(tgtTile.Type) {
-
+			if !phys.BlockedBy.Contains(tgtTile.Type) {
 				object.AddComponents(&newPosition)
 			}
 		} else {

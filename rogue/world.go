@@ -4,7 +4,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/dalloriam/rogue/rogue/gameplay"
+	"github.com/dalloriam/rogue/rogue/structure"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
 
@@ -21,7 +21,7 @@ type World struct {
 	objects map[uint64]object.GameObject
 
 	lastTick  time.Time
-	turnClock *gameplay.TurnClock
+	turnClock *structure.TurnClock
 
 	// worldMap represents the currently loaded map in its entirety -- NOT the cartography sections displayed in the viewport.
 	worldMap cartography.Map

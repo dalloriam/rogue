@@ -1,15 +1,13 @@
 package main
 
 import (
-	"image/color"
 	"time"
+
+	"github.com/dalloriam/rogue/cmd/entities"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
 
 	"github.com/dalloriam/rogue/cmd/generator"
-
-	"github.com/dalloriam/rogue/rogue/components"
-	"github.com/dalloriam/rogue/rogue/object"
 
 	"github.com/dalloriam/rogue/rogue/systems"
 
@@ -65,9 +63,10 @@ func pixelRun() {
 	// Creating the world.
 	world := rogue.NewWorld()
 	world.AddSystem(renderingSystem, 1)
+	world.AddSystem(systems.NewViewportSystem(r.GetCamera()), 2)
+	world.AddSystem(systems.NewSightSystem(), 2)
 	world.AddSystem(systems.NewMovementSystem(), 3)
 	world.AddSystem(systems.NewControllerSystem(roguepixel.NewInputHandler(r.Window)), 999)
-	world.AddSystem(systems.NewCameraSystem(r.GetCamera()), 2)
 
 	gen := generator.NewDungeonGenerator(
 		10,
@@ -86,25 +85,7 @@ func pixelRun() {
 	world.LoadMap(lvl)
 
 	playerX, playerY := findPlayer(lvl)
-
-	player := object.New(
-		&components.Drawable{
-			Char:    '@',
-			FgColor: color.White,
-			BgColor: color.RGBA{0, 0, 0, 0},
-		},
-		&components.Position{
-			X: playerX,
-			Y: playerY,
-		},
-		&components.Physics{BlockedBy: []string{"wall"}},
-		&components.PlayerControl{},
-		&components.Focus{
-			Priority: 0,
-			Punctual: false,
-		},
-	)
-	world.AddObject(player)
+	world.AddObject(entities.Player(playerX, playerY))
 
 	for r.Running() {
 		if err := world.Tick(); err != nil {

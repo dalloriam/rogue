@@ -1,4 +1,4 @@
-package gameplay
+package structure
 
 import "go.uber.org/atomic"
 

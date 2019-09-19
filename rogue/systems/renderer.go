@@ -2,6 +2,7 @@ package systems
 
 import (
 	"image/color"
+	"math"
 	"time"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
@@ -34,6 +35,30 @@ func (r *Renderer) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.DrawableName) && object.HasComponent(components.PositionName)
 }
 
+func (r *Renderer) clip(val, lowerBound, upperBound float64) float64 {
+	if val > upperBound {
+		return upperBound
+	} else if val < lowerBound {
+		return lowerBound
+	}
+	return val
+}
+
+func (r *Renderer) shadeColor(c color.Color, shadePercent float64) color.Color {
+	red, g, b, a := c.RGBA()
+
+	newR := r.clip(float64(red)*shadePercent, 0, math.MaxUint16)
+	newG := r.clip(float64(g)*shadePercent, 0, math.MaxUint16)
+	newB := r.clip(float64(b)*shadePercent, 0, math.MaxUint16)
+
+	return color.RGBA64{
+		uint16(newR),
+		uint16(newG),
+		uint16(newB),
+		uint16(a),
+	}
+}
+
 // Update updates the system state.
 func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
 
@@ -57,21 +82,25 @@ func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects ma
 	for i := 0; i < len(worldMap); i++ {
 		for j := 0; j < len(worldMap[i]); j++ {
 			currentTile := worldMap[i][j]
+			if currentTile.Visibility == 0.0 {
+				continue
+			}
+
 			// When drawing the tiles initially, we have no clue if we have an entity at this position.
 			// First, what we know for sure is that we need to draw the map tile background.
-			r.engine.Rectangle(i, j, currentTile.BgColor)
+			r.engine.Rectangle(i, j, r.shadeColor(currentTile.BgColor, currentTile.Visibility))
 
 			// Once we have the tile background, we need to check if we have an object on this tile.
 			// If so, we'll draw the object (Bg & Fg), otherwise we'll draw the tile foreground.
 			if objectMap[currentTile.X][currentTile.Y] == 0 {
 				// We don't have an entity. Proceed with the foreground
-				r.engine.Text(i, j, string([]rune{currentTile.Char}), currentTile.FgColor)
+				r.engine.Text(i, j, string([]rune{currentTile.Char}), r.shadeColor(currentTile.FgColor, currentTile.Visibility))
 			} else {
 				// We have an object. First, draw its background (if it's not transparent).
 				// TODO: Perform this check *before* rendering the tile background to save a drawing call.
 				drawable := objects[objectMap[i][j]].GetComponent(components.DrawableName).(*components.Drawable)
-				r.engine.Rectangle(i, j, drawable.BgColor)
-				r.engine.Text(i, j, string([]rune{drawable.Char}), drawable.FgColor)
+				r.engine.Rectangle(i, j, r.shadeColor(drawable.BgColor, currentTile.Visibility))
+				r.engine.Text(i, j, string([]rune{drawable.Char}), r.shadeColor(drawable.FgColor, currentTile.Visibility))
 			}
 		}
 	}
