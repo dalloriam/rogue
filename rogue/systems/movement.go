@@ -22,9 +22,9 @@ func (s *MovementSystem) ShouldTrack(object object.GameObject) bool {
 }
 
 func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
-	for _, object := range objects {
-		movement := object.GetComponent(components.MovementName).(*components.Movement)
-		position := object.GetComponent(components.PositionName).(*components.Position)
+	for _, obj := range objects {
+		movement := obj.GetComponent(components.MovementName).(*components.Movement)
+		position := obj.GetComponent(components.PositionName).(*components.Position)
 
 		newPosition := components.Position{Vec: structure.V(position.X(), position.Y())}
 		displacement := structure.V(0, 0)
@@ -49,18 +49,18 @@ func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, obje
 		}
 		newPosition.Add(displacement)
 
-		object.RemoveComponent(components.MovementName)
+		obj.RemoveComponent(components.MovementName)
 
 		// Check if the movement is blocked before triggering.
-		if object.HasComponent(components.PhysicsName) {
-			phys := object.GetComponent(components.PhysicsName).(*components.Physics)
+		if obj.HasComponent(components.PhysicsName) {
+			phys := obj.GetComponent(components.PhysicsName).(*components.Physics)
 			tgtTile := worldMap.At(newPosition)
 
 			if !phys.BlockedBy.Contains(tgtTile.Type) {
-				object.AddComponents(&newPosition)
+				obj.AddComponents(&newPosition)
 			}
 		} else {
-			object.AddComponents(&newPosition)
+			obj.AddComponents(&newPosition)
 		}
 	}
 	return nil

@@ -8,6 +8,16 @@ import (
 	"github.com/dalloriam/rogue/rogue/object"
 )
 
+var repeatActionMinDelta = 100 * time.Millisecond
+
+type inputProviderState int
+
+const (
+	defaultState inputProviderState = iota
+	repeatWaitingForAction
+	repeatMode
+)
+
 type InputProvider interface {
 	GetDirection() cartography.Direction
 
@@ -17,8 +27,13 @@ type InputProvider interface {
 type ControllerSystem struct {
 	provider InputProvider
 
-	isInRepeatMode bool
+	state inputProviderState
+
+	repeatedAction   action
+	lastActionRepeat time.Time
 }
+
+type action func(obj object.GameObject)
 
 func NewControllerSystem(provider InputProvider) *ControllerSystem {
 	return &ControllerSystem{
@@ -30,17 +45,50 @@ func (c *ControllerSystem) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.PlayerControlName) && object.HasComponent(components.PositionName)
 }
 
-func (c *ControllerSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
+func (c *ControllerSystem) getAction() action {
 	currentDirection := c.provider.GetDirection()
-	for _, obj := range objects {
-		// If a direction key is pressed, prioritize it and cancel repeat mode.
-		if currentDirection != cartography.NoDirection {
+	if currentDirection != cartography.NoDirection {
+		return func(obj object.GameObject) {
 			obj.AddComponents(&components.Movement{Direction: currentDirection})
-			c.isInRepeatMode = false
-		} else if c.provider.RepeatModeTriggered() {
-			c.isInRepeatMode = true
-		} else if c.isInRepeatMode {
+		}
+	}
 
+	if c.provider.RepeatModeTriggered() {
+		return func(obj object.GameObject) {
+			if c.state == defaultState {
+				c.state = repeatWaitingForAction
+				c.lastActionRepeat = time.Now()
+			} else {
+				c.state = defaultState
+			}
+		}
+	}
+
+	return nil
+}
+
+func (c *ControllerSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
+	playerAction := c.getAction()
+
+	for _, obj := range objects {
+		switch c.state {
+		case repeatMode:
+			if playerAction == nil && time.Since(c.lastActionRepeat) > repeatActionMinDelta {
+				c.repeatedAction(obj)
+				c.lastActionRepeat = time.Now()
+			} else if playerAction != nil {
+				c.state = defaultState
+				playerAction(obj)
+			}
+		case repeatWaitingForAction:
+			if playerAction != nil {
+				c.repeatedAction = playerAction
+				c.state = repeatMode
+			}
+		case defaultState:
+			if playerAction != nil {
+				playerAction(obj)
+			}
 		}
 	}
 	return nil
