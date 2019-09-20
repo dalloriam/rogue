@@ -68,7 +68,7 @@ func pixelRun() {
 	world.AddSystem(systems.NewViewportSystem(r.GetCamera()), 2)
 	world.AddSystem(systems.NewSightSystem(0.0), 2)
 	world.AddSystem(systems.NewMovementSystem(), 3)
-	world.AddSystem(systems.NewControllerSystem(roguepixel.NewInputHandler(r.Window)), 999)
+	world.AddSystem(systems.NewControllerSystem(), 999)
 
 	gen := generator.NewDungeonGenerator(
 		10,
@@ -89,10 +89,10 @@ func pixelRun() {
 	world.LoadMap(lvl)
 
 	playerX, playerY := findPlayer(lvl)
-	world.AddObject(entities.Player(playerX, playerY))
+	world.AddObject(entities.Player(playerX, playerY, roguepixel.NewInputHandler(r.Window)))
 
 	for r.Running() {
-		if err := world.Tick(); err != nil {
+		if err = world.Tick(); err != nil {
 			panic(err)
 		}
 	}

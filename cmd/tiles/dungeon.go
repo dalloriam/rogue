@@ -13,7 +13,7 @@ func RockWall(x, y int) cartography.Tile {
 		Position: structure.V(x, y),
 		Char:     '#',
 		FgColor:  color.Black,
-		BgColor:  color.Gray{128},
+		BgColor:  color.Gray{Y: 128},
 		Type:     "wall",
 	}
 }

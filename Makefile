@@ -56,7 +56,7 @@ install: build
 	(cp $(BUILDDIR)/$(NAME) $(HOME)/bin)
 
 .PHONY: release
-release: *.go VERSION.txt
+release: VERSION.txt
 	@echo "+ $@"
 	$(GO) generate ./...
 	$(foreach GOOSARCH,$(GOOSARCHES), \

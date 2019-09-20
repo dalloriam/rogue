@@ -9,7 +9,6 @@ import (
 
 // System represents a system.
 type System interface {
-	// Abstract.
 	ShouldTrack(object object.GameObject) bool
 	Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error
 }
