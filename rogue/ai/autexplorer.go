@@ -20,6 +20,12 @@ func NewAutoExplorer(pc *PlayerController) *AutoExplorer {
 
 // GetAction returns this player's action.
 func (e *AutoExplorer) GetAction() func(obj object.GameObject) {
+	if act := e.pc.getPlayerInputAction(); act != nil {
+		return func(obj object.GameObject) {
+			obj.AddComponents(&components.Control{Agent: e.pc})
+			act(obj)
+		}
+	}
 	d := []cartography.Direction{cartography.DirectionUp, cartography.DirectionLeft, cartography.DirectionRight, cartography.DirectionDown}
 
 	return func(obj object.GameObject) {
