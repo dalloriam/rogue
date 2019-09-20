@@ -23,6 +23,7 @@ type InputProvider interface {
 	GetDirection() cartography.Direction
 
 	RepeatModeTriggered() bool
+	AutoExploreTriggered() bool
 }
 
 // PlayerController exposes player behavior as an AI agent.
@@ -52,6 +53,12 @@ func (pc *PlayerController) getPlayerInputAction() func(obj object.GameObject) {
 	if pc.provider.RepeatModeTriggered() {
 		return func(obj object.GameObject) {
 			pc.state = repeatWaitingForAction
+		}
+	}
+
+	if pc.provider.AutoExploreTriggered() {
+		return func(obj object.GameObject) {
+			obj.AddComponents(&components.Control{Agent: NewAutoExplorer(pc)})
 		}
 	}
 	return nil
