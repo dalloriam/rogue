@@ -24,7 +24,7 @@ func (c *ControllerSystem) ShouldTrack(object object.GameObject) bool {
 func (c *ControllerSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
 	for _, obj := range objects {
 		control := obj.GetComponent(components.ControlName).(*components.Control)
-		if act := control.Agent.GetAction(); act != nil {
+		if act := control.Agent.GetAction(worldMap); act != nil {
 			act(obj)
 		}
 	}

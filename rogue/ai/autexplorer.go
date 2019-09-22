@@ -19,7 +19,7 @@ func NewAutoExplorer(pc *PlayerController) *AutoExplorer {
 }
 
 // GetAction returns this player's action.
-func (e *AutoExplorer) GetAction() func(obj object.GameObject) {
+func (e *AutoExplorer) GetAction(worldMap cartography.Map) func(obj object.GameObject) {
 	if act := e.pc.getPlayerInputAction(); act != nil {
 		return func(obj object.GameObject) {
 			obj.AddComponents(&components.Control{Agent: e.pc})

@@ -65,7 +65,7 @@ func (pc *PlayerController) getPlayerInputAction() func(obj object.GameObject) {
 }
 
 // GetAction returns the action performed by this entity.
-func (pc *PlayerController) GetAction() func(obj object.GameObject) {
+func (pc *PlayerController) GetAction(worldMap cartography.Map) func(obj object.GameObject) {
 	playerInputAction := pc.getPlayerInputAction()
 
 	switch pc.state {
