@@ -2,7 +2,7 @@ package components
 
 import "image/color"
 
-// Name of the component
+// DrawableName is the name of the component.
 const (
 	DrawableName = "drawable"
 )

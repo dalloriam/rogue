@@ -4,6 +4,7 @@ import (
 	"github.com/faiface/pixel"
 )
 
+// Camera controls camera position in a pixel window.
 type Camera struct {
 	Position pixel.Vec
 	Zoom     float64
@@ -14,6 +15,7 @@ type Camera struct {
 	leftBound, rightBound, bottomBound, topBound float64
 }
 
+// NewCamera returns a new camera instance for a pixel window.
 func NewCamera(tileWidth, tileHeight, mapWidth, mapHeight, viewportWidth, viewportHeight int) *Camera {
 
 	leftBound := viewportWidth / 2
@@ -35,11 +37,12 @@ func NewCamera(tileWidth, tileHeight, mapWidth, mapHeight, viewportWidth, viewpo
 	}
 }
 
-// Zoom zooms the camera. 1.0 is 100%.
+// SetZoom zooms the camera. 1.0 is 100%.
 func (c *Camera) SetZoom(amount float64) {
 	c.Zoom = amount
 }
 
+// Move moves the position of the camera.
 func (c *Camera) Move(x, y int) {
 	actX := float64(x * c.tileWidth)
 	if actX < c.leftBound {

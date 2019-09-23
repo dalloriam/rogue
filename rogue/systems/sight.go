@@ -11,6 +11,13 @@ import (
 	"github.com/dalloriam/rogue/rogue/object"
 )
 
+const (
+	// TODO: Make configurable
+	rayCount       = 360
+	rayStep        = 3
+	darkVisibility = 0.25
+)
+
 type SightSystem struct {
 	RayCount int
 	RayStep  int
@@ -19,10 +26,9 @@ type SightSystem struct {
 }
 
 func NewSightSystem(defaultVisibility float64) *SightSystem {
-	// TODO: Extract constants.
 	return &SightSystem{
-		RayCount:          360,
-		RayStep:           3,
+		RayCount:          rayCount,
+		RayStep:           rayStep,
 		DefaultVisibility: defaultVisibility,
 	}
 }
@@ -47,6 +53,7 @@ func (s *SightSystem) Update(dT time.Duration, worldMap cartography.Map, objects
 		worldMap.At(pos).Visibility = 1.0 // Camera always sees its own tile.
 
 		for i := 0; i < s.RayCount; i += s.RayStep {
+			// TODO: Precompute cos values.
 			ax := math.Cos(float64(i) / (180.0 / math.Pi))
 			ay := math.Sin(float64(i) / (180.0 / math.Pi))
 
@@ -77,7 +84,7 @@ func (s *SightSystem) Update(dT time.Duration, worldMap cartography.Map, objects
 		// Override tile memory
 		for _, tileVec := range cam.Memory {
 			if t := worldMap.At(tileVec); t.Visibility == 0.0 {
-				t.Visibility = 0.25 // TODO: Store somewhere
+				t.Visibility = darkVisibility
 			}
 		}
 	}

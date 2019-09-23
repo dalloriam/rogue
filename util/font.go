@@ -13,19 +13,23 @@ func LoadTTF(path string, size float64) (font.Face, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() {
+		if closeError := file.Close(); err != nil {
+			panic(closeError)
+		}
+	}()
 
 	bytes, err := ioutil.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
 
-	font, err := truetype.Parse(bytes)
+	loadedFont, err := truetype.Parse(bytes)
 	if err != nil {
 		return nil, err
 	}
 
-	return truetype.NewFace(font, &truetype.Options{
+	return truetype.NewFace(loadedFont, &truetype.Options{
 		Size:              size,
 		GlyphCacheEntries: 1,
 	}), nil

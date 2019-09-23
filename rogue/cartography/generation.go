@@ -10,6 +10,7 @@ type LevelTemplate interface {
 	Generate(source *rand.Rand) Map
 }
 
+// A LevelManager manages the multiple levels in a game world, and simplifies the transitions between them.
 type LevelManager struct {
 	filePath string
 	levels   map[string]Map
@@ -17,6 +18,7 @@ type LevelManager struct {
 	randomSource *rand.Rand
 }
 
+// NewLevelManager initializes & returns a new level manager.
 func NewLevelManager(levelFilePath string, seed int64) *LevelManager {
 	src := rand.NewSource(seed)
 	fmt.Printf("Seed: %d\n", seed)
@@ -27,12 +29,13 @@ func NewLevelManager(levelFilePath string, seed int64) *LevelManager {
 	}
 }
 
+// GetLevel returns the desired level given its name.
 func (m *LevelManager) GetLevel(name string) (Map, bool) {
 	lvl, ok := m.levels[name]
 	return lvl, ok
 }
 
-// AddLevel
+// AddLevel adds a new level to the manager.
 func (m *LevelManager) AddLevel(name string, template LevelTemplate) Map {
 	m.levels[name] = template.Generate(m.randomSource)
 	return m.levels[name]

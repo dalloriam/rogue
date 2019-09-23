@@ -26,8 +26,7 @@ func (m *mockTemplate) Generate(source *rand.Rand) cartography.Map {
 
 func TestLevelManager_Generation(t *testing.T) {
 	m := cartography.NewLevelManager("test.txt", 1234)
-	_, ok := m.GetLevel("test_level")
-	if ok {
+	if _, ok := m.GetLevel("test_level"); ok {
 		t.Error("level should not exist")
 		return
 	}

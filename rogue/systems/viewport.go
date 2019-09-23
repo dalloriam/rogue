@@ -44,11 +44,13 @@ func (c *ViewportSystem) Update(dT time.Duration, worldMap cartography.Map, obje
 		}
 	}
 
-	// TODO: Do tile size conversion.
-	c.cam.Move(bestPos.X(), bestPos.Y())
+	if bestPos != nil {
+		// We only move the camera if one exists.
+		c.cam.Move(bestPos.X(), bestPos.Y())
 
-	if punctual && bestObject != nil {
-		bestObject.RemoveComponent(components.FocusName)
+		if punctual && bestObject != nil {
+			bestObject.RemoveComponent(components.FocusName)
+		}
 	}
 
 	return nil

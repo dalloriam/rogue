@@ -16,6 +16,15 @@ func NewInputHandler(win *pixelgl.Window) *InputHandler {
 	}
 }
 
+// RepeatModeTriggered returns if repeat mode was triggered.
+func (i *InputHandler) RepeatModeTriggered() bool {
+	return i.window.JustPressed(pixelgl.KeyW)
+}
+
+func (i *InputHandler) AutoExploreTriggered() bool {
+	return i.window.JustPressed(pixelgl.KeyX)
+}
+
 func (i *InputHandler) GetDirection() cartography.Direction {
 	if i.window.JustPressed(pixelgl.KeyK) {
 		return cartography.DirectionUp

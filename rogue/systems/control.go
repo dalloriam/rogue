@@ -8,28 +8,24 @@ import (
 	"github.com/dalloriam/rogue/rogue/object"
 )
 
-type InputProvider interface {
-	GetDirection() cartography.Direction
+type ControllerSystem struct{}
+
+func NewControllerSystem() *ControllerSystem {
+	return &ControllerSystem{}
 }
 
-type ControllerSystem struct {
-	provider InputProvider
-}
-
-func NewControllerSystem(provider InputProvider) *ControllerSystem {
-	return &ControllerSystem{
-		provider: provider,
-	}
-}
-
+// ShouldTrack returns whether
 func (c *ControllerSystem) ShouldTrack(object object.GameObject) bool {
-	return object.HasComponent(components.PlayerControlName) && object.HasComponent(components.PositionName)
+	return object.HasComponent(components.ControlName) && object.HasComponent(components.PositionName)
 }
 
 func (c *ControllerSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
-	dir := c.provider.GetDirection()
 	for _, obj := range objects {
-		obj.AddComponents(&components.Movement{Direction: dir})
+		control := obj.GetComponent(components.ControlName).(*components.Control)
+		if action := control.Agent.GetAction(obj, worldMap); action != nil && obj.HasComponent(components.InitiativeName) {
+			action()
+			obj.RemoveComponent(components.InitiativeName)
+		}
 	}
 	return nil
 }

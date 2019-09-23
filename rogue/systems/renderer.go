@@ -10,7 +10,7 @@ import (
 	"github.com/dalloriam/rogue/rogue/object"
 )
 
-// RenderingBackend abstracts a rendering engine.
+// RenderingEngine abstracts a rendering engine.
 type RenderingEngine interface {
 	Clear()
 	Draw()
@@ -52,10 +52,10 @@ func (r *Renderer) shadeColor(c color.Color, shadePercent float64) color.Color {
 	newB := r.clip(float64(b)*shadePercent, 0, math.MaxUint16)
 
 	return color.RGBA64{
-		uint16(newR),
-		uint16(newG),
-		uint16(newB),
-		uint16(a),
+		R: uint16(newR),
+		G: uint16(newG),
+		B: uint16(newB),
+		A: uint16(a),
 	}
 }
 

@@ -6,9 +6,9 @@ import (
 	"github.com/dalloriam/rogue/rogue/components"
 )
 
-func TestPlayerControl_Name(t *testing.T) {
-	d := &components.PlayerControl{}
-	if d.Name() != components.PlayerControlName {
+func TestControl_Name(t *testing.T) {
+	d := &components.Control{}
+	if d.Name() != components.ControlName {
 		t.Error("invalid name")
 	}
 }
