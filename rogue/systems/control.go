@@ -10,8 +10,6 @@ import (
 
 type ControllerSystem struct{}
 
-type action func(obj object.GameObject)
-
 func NewControllerSystem() *ControllerSystem {
 	return &ControllerSystem{}
 }
@@ -24,8 +22,9 @@ func (c *ControllerSystem) ShouldTrack(object object.GameObject) bool {
 func (c *ControllerSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
 	for _, obj := range objects {
 		control := obj.GetComponent(components.ControlName).(*components.Control)
-		if act := control.Agent.GetAction(worldMap); act != nil {
-			act(obj)
+		if action := control.Agent.GetAction(obj, worldMap); action != nil && obj.HasComponent(components.InitiativeName) {
+			action()
+			obj.RemoveComponent(components.InitiativeName)
 		}
 	}
 	return nil

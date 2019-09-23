@@ -19,16 +19,14 @@ func NewAutoExplorer(pc *PlayerController) *AutoExplorer {
 }
 
 // GetAction returns this player's action.
-func (e *AutoExplorer) GetAction(worldMap cartography.Map) func(obj object.GameObject) {
-	if act := e.pc.getPlayerInputAction(); act != nil {
-		return func(obj object.GameObject) {
-			obj.AddComponents(&components.Control{Agent: e.pc})
-			act(obj)
-		}
+func (e *AutoExplorer) GetAction(obj object.GameObject, worldMap cartography.Map) func() {
+	if act := e.pc.getPlayerInputAction(obj); act != nil {
+		obj.AddComponents(&components.Control{Agent: e.pc})
+		return nil
 	}
 	d := []cartography.Direction{cartography.DirectionUp, cartography.DirectionLeft, cartography.DirectionRight, cartography.DirectionDown}
 
-	return func(obj object.GameObject) {
+	return func() {
 		obj.AddComponents(&components.Movement{Direction: d[rand.Intn(len(d))]})
 	}
 }

@@ -68,7 +68,8 @@ func pixelRun() {
 	world.AddSystem(systems.NewViewportSystem(r.GetCamera()), 2)
 	world.AddSystem(systems.NewSightSystem(0.0), 2)
 	world.AddSystem(systems.NewMovementSystem(), 3)
-	world.AddSystem(systems.NewControllerSystem(), 999)
+	world.AddSystem(systems.NewControllerSystem(), 998)
+	world.AddSystem(systems.NewInitiativeSystem(), 999)
 
 	gen := generator.NewDungeonGenerator(
 		10,

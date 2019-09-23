@@ -1,14 +1,12 @@
 package ai
 
 import (
-	"time"
+	"fmt"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/object"
 )
-
-var repeatActionMinDelta = 100 * time.Millisecond
 
 type inputProviderState int
 
@@ -28,8 +26,7 @@ type InputProvider interface {
 
 // PlayerController exposes player behavior as an AI agent.
 type PlayerController struct {
-	lastActionRepeat time.Time
-	repeatedAction   func(obj object.GameObject)
+	repeatedAction func(obj object.GameObject)
 
 	provider InputProvider
 	state    inputProviderState
@@ -42,49 +39,48 @@ func NewPlayerController(provider InputProvider) *PlayerController {
 	}
 }
 
-func (pc *PlayerController) getPlayerInputAction() func(obj object.GameObject) {
+func (pc *PlayerController) getPlayerInputAction(tgtObj object.GameObject) func(obj object.GameObject) {
 	currentDirection := pc.provider.GetDirection()
 	if currentDirection != cartography.NoDirection {
+		fmt.Println("Key hit")
 		return func(obj object.GameObject) {
 			obj.AddComponents(&components.Movement{Direction: currentDirection})
 		}
 	}
 
 	if pc.provider.RepeatModeTriggered() {
-		return func(obj object.GameObject) {
-			pc.state = repeatWaitingForAction
-		}
+		pc.state = repeatWaitingForAction
+		return nil
 	}
 
 	if pc.provider.AutoExploreTriggered() {
-		return func(obj object.GameObject) {
-			obj.AddComponents(&components.Control{Agent: NewAutoExplorer(pc)})
-		}
+		tgtObj.AddComponents(&components.Control{Agent: NewAutoExplorer(pc)})
+		return nil
 	}
 	return nil
 }
 
 // GetAction returns the action performed by this entity.
-func (pc *PlayerController) GetAction(worldMap cartography.Map) func(obj object.GameObject) {
-	playerInputAction := pc.getPlayerInputAction()
+func (pc *PlayerController) GetAction(obj object.GameObject, worldMap cartography.Map) func() {
+	playerInputAction := pc.getPlayerInputAction(obj)
 
 	switch pc.state {
 	case defaultState:
-		return playerInputAction
+		if playerInputAction != nil {
+			return func() { playerInputAction(obj) }
+		}
 
 	case repeatWaitingForAction:
 		if playerInputAction != nil {
 			pc.repeatedAction = playerInputAction
 			pc.state = repeatMode
-			return playerInputAction
+			return func() { playerInputAction(obj) }
 		}
 	case repeatMode:
-		if playerInputAction == nil && time.Since(pc.lastActionRepeat) > repeatActionMinDelta {
-			pc.lastActionRepeat = time.Now()
-			return pc.repeatedAction
-		} else if playerInputAction != nil {
+		if playerInputAction == nil {
+			return func() { pc.repeatedAction(obj) }
+		} else {
 			pc.state = defaultState
-			return playerInputAction
 		}
 	}
 	return nil

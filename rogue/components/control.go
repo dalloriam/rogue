@@ -10,7 +10,7 @@ const (
 )
 
 type Agent interface {
-	GetAction(worldMap cartography.Map) func(obj object.GameObject)
+	GetAction(obj object.GameObject, worldMap cartography.Map) func()
 }
 
 type Control struct {

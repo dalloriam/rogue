@@ -11,7 +11,7 @@ import (
 )
 
 func TestNewObject(t *testing.T) {
-	obj1 := object.New(&components.PlayerControl{}, &components.Position{
+	obj1 := object.New(&components.Control{}, &components.Position{
 		Vec: structure.V(0, 0),
 	})
 
@@ -20,7 +20,7 @@ func TestNewObject(t *testing.T) {
 		return
 	}
 
-	if !obj1.HasComponent(components.PlayerControlName) || !obj1.HasComponent(components.PositionName) {
+	if !obj1.HasComponent(components.ControlName) || !obj1.HasComponent(components.PositionName) {
 		t.Error("components not initialized properly")
 		return
 	}
@@ -39,14 +39,14 @@ func TestNewObject(t *testing.T) {
 
 func TestBaseObject_AddComponents(t *testing.T) {
 	obj1 := object.New()
-	if obj1.HasComponent(components.PlayerControlName) {
+	if obj1.HasComponent(components.ControlName) {
 		t.Error("object has component before adding")
 		return
 	}
 
 	// Test single add.
-	obj1.AddComponents(&components.PlayerControl{})
-	if !obj1.HasComponent(components.PlayerControlName) {
+	obj1.AddComponents(&components.Control{})
+	if !obj1.HasComponent(components.ControlName) {
 		t.Error("component not added properly")
 		return
 	}
@@ -74,7 +74,7 @@ func TestBaseObject_RemoveComponent(t *testing.T) {
 }
 
 func TestBaseObject_GetComponent(t *testing.T) {
-	playerControl := &components.PlayerControl{}
+	playerControl := &components.Control{}
 	pos := &components.Position{
 		Vec: structure.V(123, 14),
 	}
@@ -85,7 +85,7 @@ func TestBaseObject_GetComponent(t *testing.T) {
 		return
 	}
 
-	if ctrl2 := obj1.GetComponent(components.PlayerControlName).(*components.PlayerControl); ctrl2 != playerControl {
+	if ctrl2 := obj1.GetComponent(components.ControlName).(*components.Control); ctrl2 != playerControl {
 		t.Error("wrong component returned")
 		return
 	}
