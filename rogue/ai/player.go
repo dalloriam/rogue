@@ -1,8 +1,6 @@
 package ai
 
 import (
-	"fmt"
-
 	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/object"
@@ -42,7 +40,6 @@ func NewPlayerController(provider InputProvider) *PlayerController {
 func (pc *PlayerController) getPlayerInputAction(tgtObj object.GameObject) func(obj object.GameObject) {
 	currentDirection := pc.provider.GetDirection()
 	if currentDirection != cartography.NoDirection {
-		fmt.Println("Key hit")
 		return func(obj object.GameObject) {
 			obj.AddComponents(&components.Movement{Direction: currentDirection})
 		}
