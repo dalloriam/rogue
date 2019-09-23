@@ -1,6 +1,7 @@
 package cartography
 
 import (
+	"fmt"
 	"image/color"
 
 	"github.com/dalloriam/rogue/rogue/structure"
@@ -48,4 +49,20 @@ func (m Map) At(position structure.Vec) *Tile {
 
 func (m Map) Set(tile Tile) {
 	m[tile.Position.X()][tile.Position.Y()] = tile
+}
+
+func (m Map) aStarSearch(begin, end structure.Vec) (structure.Vec, float64) {
+	frontier := make(PriorityQueue, 0)
+	frontier.Push(&Item{Pos: begin, Score: 0})
+
+	x := make(map[structure.Vec]structure.Vec)
+	fmt.Println(x)
+
+	return nil, 0
+}
+
+func (m Map) FindPath(begin, end structure.Vec) []structure.Vec {
+	var path []structure.Vec
+
+	return path
 }
