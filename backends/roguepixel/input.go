@@ -10,6 +10,7 @@ type InputHandler struct {
 	window *pixelgl.Window
 }
 
+// NewInputHandler creates and returns a pixel input handler.
 func NewInputHandler(win *pixelgl.Window) *InputHandler {
 	return &InputHandler{
 		window: win,
@@ -21,10 +22,12 @@ func (i *InputHandler) RepeatModeTriggered() bool {
 	return i.window.JustPressed(pixelgl.KeyW)
 }
 
+// AutoExploreTriggered returns whether the autoexplore key was hit.
 func (i *InputHandler) AutoExploreTriggered() bool {
 	return i.window.JustPressed(pixelgl.KeyX)
 }
 
+// GetDirection returns the direction key currently pressed.
 func (i *InputHandler) GetDirection() cartography.Direction {
 	if i.window.JustPressed(pixelgl.KeyK) {
 		return cartography.DirectionUp

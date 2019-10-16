@@ -27,6 +27,7 @@ type World struct {
 	worldMap cartography.Map
 }
 
+// NewWorld creates and returns a world.
 func NewWorld() *World {
 	return &World{
 		systemPriorities: make(map[*systems.GameSystem]int),
@@ -35,15 +36,18 @@ func NewWorld() *World {
 	}
 }
 
+// LoadMap loads a map into the world.
 func (w *World) LoadMap(m cartography.Map) {
 	w.worldMap = m
 }
 
+// AddObject adds an object to the list of objects managed by the world's systems.
 func (w *World) AddObject(object object.GameObject) {
 	// Add the object to the main registry.
 	w.objects[object.ID()] = object
 }
 
+// AddSystem adds a new processing system to the world. The lower the priority, the later the system will run.
 func (w *World) AddSystem(sys systems.System, priority int) {
 	w.systemPriorities[systems.NewGameSystem(sys)] = priority
 
@@ -59,6 +63,7 @@ func (w *World) AddSystem(sys systems.System, priority int) {
 	w.systems = sysColl
 }
 
+// Tick performs a single world update. Corresponds to a frame with non-cli renderers .
 func (w *World) Tick() error {
 	dT := time.Since(w.lastTick)
 	w.lastTick = time.Now()

@@ -8,8 +8,10 @@ import (
 	"github.com/dalloriam/rogue/rogue/object"
 )
 
+// The ControllerSystem applies actions performed by the various game objects.
 type ControllerSystem struct{}
 
+// NewControllerSystem returns an empty controller system.
 func NewControllerSystem() *ControllerSystem {
 	return &ControllerSystem{}
 }
@@ -19,6 +21,7 @@ func (c *ControllerSystem) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.ControlName) && object.HasComponent(components.PositionName)
 }
 
+// Update updates the system for a tick.
 func (c *ControllerSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
 	for _, obj := range objects {
 		control := obj.GetComponent(components.ControlName).(*components.Control)

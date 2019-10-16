@@ -6,6 +6,7 @@ var (
 	idCounter uint64
 )
 
+// A GameObject is the interface representing an object tracked by the world.
 type GameObject interface {
 	ID() uint64
 
@@ -50,6 +51,7 @@ func (o *BaseObject) AddComponents(components ...Component) {
 	}
 }
 
+// RemoveComponent removes the specified component from the object.
 func (o *BaseObject) RemoveComponent(name string) {
 	delete(o.components, name)
 }
@@ -60,6 +62,7 @@ func (o *BaseObject) HasComponent(name string) bool {
 	return ok
 }
 
+// GetComponent gets the specified component from the object, panicking if it does not exist.
 func (o *BaseObject) GetComponent(name string) Component {
 	// TODO: Make safe
 	return o.components[name]

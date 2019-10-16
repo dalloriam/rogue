@@ -1,5 +1,6 @@
 package structure
 
+// Vec represents a 2D vector.
 type Vec interface {
 	X() int
 	Y() int
@@ -12,6 +13,7 @@ type vec struct {
 	y int
 }
 
+// V returns a 2D vector.
 func V(x, y int) Vec {
 	return &vec{x, y}
 }

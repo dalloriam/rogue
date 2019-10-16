@@ -5,6 +5,7 @@ import (
 	"github.com/purposed/good/datastructure/stringset"
 )
 
+// Name of the component
 const (
 	CameraName = "camera"
 )
@@ -17,6 +18,7 @@ type Camera struct {
 	BlockedBy stringset.StringSet
 }
 
+// Name returns the name of the component.
 func (c *Camera) Name() string {
 	return CameraName
 }

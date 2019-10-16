@@ -13,6 +13,7 @@ import (
 	"github.com/purposed/good/datastructure/stringset"
 )
 
+// Player builds a player object.
 func Player(x, y int, handler *roguepixel.InputHandler) object.GameObject {
 	return object.New(
 		&components.Drawable{

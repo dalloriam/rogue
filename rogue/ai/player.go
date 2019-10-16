@@ -76,9 +76,8 @@ func (pc *PlayerController) GetAction(obj object.GameObject, worldMap cartograph
 	case repeatMode:
 		if playerInputAction == nil {
 			return func() { pc.repeatedAction(obj) }
-		} else {
-			pc.state = defaultState
 		}
+		pc.state = defaultState
 	}
 	return nil
 }

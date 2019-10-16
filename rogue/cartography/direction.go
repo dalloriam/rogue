@@ -1,7 +1,9 @@
 package cartography
 
+// A Direction represents a way an object can move.
 type Direction string
 
+// List of available directions.
 const (
 	DirectionUp        Direction = "up"
 	DirectionDown      Direction = "down"

@@ -9,6 +9,7 @@ import (
 	"github.com/dalloriam/rogue/rogue/cartography"
 )
 
+// A Rectangle is a rectangle drawn on map.
 type Rectangle struct {
 	// TODO: Extract in some kind of "map building kit" package.
 	StartX int
@@ -20,6 +21,7 @@ type Rectangle struct {
 	CenterY int
 }
 
+// NewRectangle creates a rectangle with the specified dimensions.
 func NewRectangle(x, y, w, h float64) Rectangle {
 	r := Rectangle{
 		StartX: int(x),
@@ -47,6 +49,7 @@ type DungeonGenerator struct {
 	levelMap cartography.Map
 }
 
+// NewDungeonGenerator creates and returns a dungeon generator.
 func NewDungeonGenerator(maxRoomSize, minRoomSize, maxNumberOfRooms, mapSizeX, mapSizeY int) *DungeonGenerator {
 	return &DungeonGenerator{
 		MaxRoomSize:      maxRoomSize,
@@ -83,6 +86,7 @@ func (g *DungeonGenerator) digHorizontalTunnel(startX, endX, y int) {
 	}
 }
 
+// Generate generates a map using a randomness source.
 func (g *DungeonGenerator) Generate(source *rand.Rand) cartography.Map {
 	maxAttempts := 50
 	// Initialize an empty map.

@@ -11,6 +11,7 @@ import (
 	"github.com/faiface/pixel/text"
 )
 
+// GridRenderOptions collects pixel-specific rendering options.
 type GridRenderOptions struct {
 	// Font settings.
 	FontFacePath string
@@ -79,6 +80,7 @@ func NewRenderer(opt GridRenderOptions) (*GridRenderer, error) {
 	return &r, nil
 }
 
+// GetCamera returns the camera in use.
 func (r *GridRenderer) GetCamera() *Camera {
 	return r.camera
 }
@@ -91,6 +93,7 @@ func (r *GridRenderer) getFontAtlas() (*text.Atlas, error) {
 	return text.NewAtlas(face, text.ASCII), nil
 }
 
+// Rectangle draws a rectangle on screen.
 func (r *GridRenderer) Rectangle(x, y int, bgColor color.Color) {
 	r.imd.Color = bgColor
 
@@ -102,6 +105,7 @@ func (r *GridRenderer) Rectangle(x, y int, bgColor color.Color) {
 	r.imd.Rectangle(0)
 }
 
+// Text draws text on screen.
 func (r *GridRenderer) Text(x, y int, text string, fgColor color.Color) {
 	r.textDrawer.Color = fgColor
 	r.textDrawer.Dot = pixel.V(float64(x*r.opt.TileWidth), float64(y*r.opt.TileHeight))
@@ -114,6 +118,7 @@ func (r *GridRenderer) Text(x, y int, text string, fgColor color.Color) {
 
 }
 
+// Clear clears the whole window.
 func (r *GridRenderer) Clear() {
 	// TODO: This supposes that the whole screen is redrawn each frame. This is far from optimal & will need to be
 	//  improved at a later time.
@@ -122,6 +127,7 @@ func (r *GridRenderer) Clear() {
 	r.Window.Clear(pixel.RGB(0, 0, 0)) // TODO: Make configurable
 }
 
+// Draw draws everything currently buffered to the window.
 func (r *GridRenderer) Draw() {
 	cam := pixel.IM.Scaled(r.camera.Position, r.camera.Zoom).Moved(r.Window.Bounds().Center().Sub(r.camera.Position))
 	r.Window.SetMatrix(cam)
@@ -131,6 +137,7 @@ func (r *GridRenderer) Draw() {
 	r.Window.Update()
 }
 
+// Running returns whether the renderer is currently running.
 func (r *GridRenderer) Running() bool {
 	return !r.Window.Closed()
 }
