@@ -23,4 +23,4 @@ jobs:
         go get -v -t -d ./...
         pip install bake-cli
     - name: Validation
-      run: bake validate
+      run: bake go/validate
