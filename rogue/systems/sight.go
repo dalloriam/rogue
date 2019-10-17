@@ -18,6 +18,7 @@ const (
 	darkVisibility = 0.25
 )
 
+// The SightSystem tracks LOS for various objects.
 type SightSystem struct {
 	RayCount int
 	RayStep  int
@@ -25,6 +26,7 @@ type SightSystem struct {
 	DefaultVisibility float64
 }
 
+// NewSightSystem returns a new sight system.
 func NewSightSystem(defaultVisibility float64) *SightSystem {
 	return &SightSystem{
 		RayCount:          rayCount,
@@ -38,6 +40,7 @@ func (s *SightSystem) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.CameraName) && object.HasComponent(components.PositionName)
 }
 
+// Update updates LOS for all tracked objects.
 func (s *SightSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
 	// Make all tiles invisible.
 	for i := 0; i < len(worldMap); i++ {

@@ -11,6 +11,7 @@ import (
 
 var minTurnDelta = 100 * time.Millisecond // TODO: Make configurable.
 
+// InitiativeSystem tracks entity initiative.
 type InitiativeSystem struct {
 	playerWentFirst bool
 	turnCount       uint64
@@ -28,10 +29,12 @@ func NewInitiativeSystem() *InitiativeSystem {
 	}
 }
 
+// ShouldTrack returns true if the object has a Control component.
 func (s *InitiativeSystem) ShouldTrack(obj object.GameObject) bool {
 	return obj.HasComponent(components.ControlName)
 }
 
+// Update updates initiative for all objects.
 func (s *InitiativeSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
 	if time.Since(s.timeOfLastTurn) < minTurnDelta {
 		// No initiative possible -- not enough time.

@@ -11,10 +11,16 @@ jobs:
       with:
         go-version: 1.13
       id: go
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.7.x'
+        architecture: x64
     - name: Check out code
       uses: actions/checkout@v1
     - name: Get dependencies
       run: |
         go get -v -t -d ./...
-    - name: Unit Tests
-      run: make test
+        pip install bake-cli
+    - name: Validation
+      run: bake validate

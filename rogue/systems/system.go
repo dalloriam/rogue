@@ -25,6 +25,7 @@ func NewGameSystem(sys System) *GameSystem {
 	}
 }
 
+// Update updates all objects tracked by the system.
 func (b *GameSystem) Update(dT time.Duration, currentMap cartography.Map, gameObjects map[uint64]object.GameObject) error {
 	// Filter out invalid objects.
 	desiredObjects := make(map[uint64]object.GameObject)

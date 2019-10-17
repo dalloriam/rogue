@@ -5,11 +5,11 @@ import (
 
 	"github.com/dalloriam/rogue/rogue/structure"
 
-	"github.com/dalloriam/rogue/cmd/entities"
+	"github.com/dalloriam/rogue/cmd/testgame/entities"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
 
-	"github.com/dalloriam/rogue/cmd/generator"
+	"github.com/dalloriam/rogue/cmd/testgame/generator"
 
 	"github.com/dalloriam/rogue/rogue/systems"
 

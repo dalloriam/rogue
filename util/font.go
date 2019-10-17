@@ -8,6 +8,7 @@ import (
 	"golang.org/x/image/font"
 )
 
+// LoadTTF loads a font given a path & size.
 func LoadTTF(path string, size float64) (font.Face, error) {
 	file, err := os.Open(path)
 	if err != nil {

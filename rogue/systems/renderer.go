@@ -31,6 +31,7 @@ func NewRenderer(engine RenderingEngine) (*Renderer, error) {
 	}, nil
 }
 
+// ShouldTrack returns true if the object has a position component & is drawable.
 func (r *Renderer) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.DrawableName) && object.HasComponent(components.PositionName)
 }

@@ -10,17 +10,21 @@ import (
 	"github.com/dalloriam/rogue/rogue/object"
 )
 
+// The MovementSystem handles entity movement.
 type MovementSystem struct {
 }
 
+// NewMovementSystem returns a new movement system.
 func NewMovementSystem() *MovementSystem {
 	return &MovementSystem{}
 }
 
+// ShouldTrack returns true if the object has a movement component & a position component.
 func (s *MovementSystem) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.MovementName) && object.HasComponent(components.PositionName)
 }
 
+// Update applies pending movements.
 func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
 	for _, obj := range objects {
 		movement := obj.GetComponent(components.MovementName).(*components.Movement)

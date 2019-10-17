@@ -10,23 +10,28 @@ import (
 	"github.com/dalloriam/rogue/rogue/object"
 )
 
+// A Viewport represents a camera.
 type Viewport interface {
 	Move(x, y int)
 	SetZoom(amount float64)
 }
 
+// The ViewportSystem moves the viewport according to objects that request it.
 type ViewportSystem struct {
 	cam Viewport
 }
 
+// NewViewportSystem returns a new viewport system.
 func NewViewportSystem(camera Viewport) *ViewportSystem {
 	return &ViewportSystem{cam: camera}
 }
 
+// ShouldTrack returns true if the object has the focus & position components.
 func (c *ViewportSystem) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.FocusName) && object.HasComponent(components.PositionName)
 }
 
+// Update moves the viewport.
 func (c *ViewportSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
 	var bestPos structure.Vec
 	highestPriority := -1

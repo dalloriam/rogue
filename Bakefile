@@ -1,0 +1,47 @@
+CWD=$(pwd)
+
+BUILD_DIR=$CWD/bin
+DEBUG_DIR=$BUILD_DIR/debug
+RELEASE_DIR=$BUILD_DIR/release
+
+CGO_ENABLED=1
+
+go/build_setup:
+    bake_step "Creating [${DEBUG_DIR}]"
+    mkdir -p $DEBUG_DIR
+
+    bake_step "Creating [${RELEASE_DIR}]"
+    mkdir -p $RELEASE_DIR
+
+go/build: go/build_setup
+    TGT_PATH=$DEBUG_DIR/$2
+    bake_step "Building to [$DEBUG_DIR/$2]"
+    CGO_ENABLED=$CGO_ENABLED go build \
+        -o $DEBUG_DIR/$2 $1;
+
+go/fmt:
+	if [[ ! -z "$(gofmt -s -l . | grep -v '.pb.go:' | grep -v '.twirp.go:' | grep -v vendor | tee /dev/stderr)" ]]; then
+		exit 1
+	fi
+
+go/lint:
+	if [[ ! -z "$(golint ./... | grep -v '.pb.go:' | grep -v '.twirp.go:' | grep -v vendor | tee /dev/stderr)" ]]; then
+		exit 1
+	fi
+
+go/test:
+    # TODO: Add options for path excludes
+	go test -race -cover ./rogue/...
+
+go/vet:
+	if [[ ! -z "$(go vet $(go list ./... | grep -v vendor) | tee /dev/stderr)" ]]; then
+		exit 1;
+	fi
+
+go/validate: go/fmt go/lint go/vet go/test
+
+build/test_game:
+    bake go/build ./cmd/testgame game
+
+clean:
+    bake_step "Cleaning [${BUILD_DIR}]"

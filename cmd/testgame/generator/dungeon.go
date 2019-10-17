@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/dalloriam/rogue/cmd/tiles"
+	"github.com/dalloriam/rogue/cmd/testgame/tiles"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
 )
