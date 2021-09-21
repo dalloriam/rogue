@@ -23,6 +23,10 @@ func NewViewportSystem(camera Viewport) *ViewportSystem {
 	return &ViewportSystem{cam: camera}
 }
 
+func (v *ViewportSystem) Name() string {
+	return "viewport"
+}
+
 func (c *ViewportSystem) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.FocusName) && object.HasComponent(components.PositionName)
 }

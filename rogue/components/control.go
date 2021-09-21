@@ -1,7 +1,6 @@
 package components
 
 import (
-	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/object"
 )
 
@@ -10,7 +9,7 @@ const (
 )
 
 type Agent interface {
-	GetAction(obj object.GameObject, worldMap cartography.Map) func()
+	GetAction(obj object.GameObject) func()
 }
 
 type Control struct {

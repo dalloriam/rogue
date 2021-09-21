@@ -4,6 +4,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/structure"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
@@ -59,12 +60,36 @@ func (w *World) AddSystem(sys systems.System, priority int) {
 	w.systems = sysColl
 }
 
+func (w *World) computeObjectPositionalMap() [][][]uint64 {
+	objectMap := make([][][]uint64, w.worldMap.SizeX())
+	for i := 0; i < w.worldMap.SizeX(); i++ {
+		objectMap[i] = make([][]uint64, w.worldMap.SizeY())
+	}
+	for _, obj := range w.objects {
+		if !obj.HasComponent(components.PositionName) {
+			continue
+		}
+
+		position := obj.GetComponent(components.PositionName).(*components.Position)
+		objectMap[position.X()][position.Y()] = append(objectMap[position.X()][position.Y()], obj.ID())
+	}
+
+	return objectMap
+}
+
 func (w *World) Tick() error {
 	dT := time.Since(w.lastTick)
 	w.lastTick = time.Now()
 
+	info := systems.UpdateInfo{
+		DeltaT:            dT,
+		ObjectsByID:       w.objects,
+		ObjectPositionMap: w.computeObjectPositionalMap(),
+		WorldMap:          w.worldMap,
+	}
+
 	for _, system := range w.systems {
-		if err := system.Update(dT, w.worldMap, w.objects); err != nil {
+		if err := system.Update(info); err != nil {
 			return err
 		}
 	}

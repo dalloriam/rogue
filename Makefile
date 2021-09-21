@@ -48,7 +48,7 @@ clean: ## Cleanup any build binaries or packages.
 .PHONY: build
 build: VERSION.txt
 	@echo "+ $@"
-	$(call build,$(BUILDDIR),$(NAME),cmd/*)
+	$(call build,$(BUILDDIR),$(NAME),cmd/main.go)
 
 .PHONY: install
 install: build

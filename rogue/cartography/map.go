@@ -6,12 +6,20 @@ import (
 	"github.com/dalloriam/rogue/rogue/structure"
 )
 
+type TileVisibility float64
+
+const (
+	VisibilityNone       TileVisibility = 0.0
+	VisibilityOutOfSight TileVisibility = 0.25
+	VisibilityInSight                   = 1.0
+)
+
 type Tile struct {
 	Position structure.Vec
 
 	Type string // TODO: Find better way of representing tile type.
 
-	Visibility float64 // 0.0 is invisible, 1.0 is fully lit.
+	Visibility TileVisibility
 
 	Char    rune
 	FgColor color.Color
@@ -48,4 +56,17 @@ func (m Map) At(position structure.Vec) *Tile {
 
 func (m Map) Set(tile Tile) {
 	m[tile.Position.X()][tile.Position.Y()] = tile
+}
+
+func (m Map) Copy() Map {
+	n := NewMap(m.SizeX(), m.SizeY())
+
+	for i := 0; i < m.SizeX(); i++ {
+		for j := 0; j < m.SizeY(); j++ {
+			n.Set(m[i][j])
+			n[i][j] = m[i][j]
+		}
+	}
+
+	return n
 }

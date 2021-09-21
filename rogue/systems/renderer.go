@@ -31,8 +31,12 @@ func NewRenderer(engine RenderingEngine) (*Renderer, error) {
 	}, nil
 }
 
+func (r *Renderer) Name() string {
+	return "renderer"
+}
+
 func (r *Renderer) ShouldTrack(object object.GameObject) bool {
-	return object.HasComponent(components.DrawableName) && object.HasComponent(components.PositionName)
+	return object.HasComponent(components.DrawableName) && object.HasComponent(components.ObservedPositionName)
 }
 
 func (r *Renderer) clip(val, lowerBound, upperBound float64) float64 {
@@ -74,7 +78,7 @@ func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects ma
 		objectMap[i] = make([]uint64, worldMap.SizeY())
 	}
 	for _, obj := range objects {
-		position := obj.GetComponent(components.PositionName).(*components.Position)
+		position := obj.GetComponent(components.ObservedPositionName).(*components.ObservedPosition)
 		objectMap[position.X()][position.Y()] = obj.ID()
 	}
 
@@ -88,19 +92,19 @@ func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects ma
 
 			// When drawing the tiles initially, we have no clue if we have an entity at this position.
 			// First, what we know for sure is that we need to draw the map tile background.
-			r.engine.Rectangle(i, j, r.shadeColor(currentTile.BgColor, currentTile.Visibility))
+			r.engine.Rectangle(i, j, r.shadeColor(currentTile.BgColor, float64(currentTile.Visibility)))
 
 			// Once we have the tile background, we need to check if we have an object on this tile.
 			// If so, we'll draw the object (Bg & Fg), otherwise we'll draw the tile foreground.
 			if objectMap[currentTile.Position.X()][currentTile.Position.Y()] == 0 {
 				// We don't have an entity. Proceed with the foreground
-				r.engine.Text(i, j, string([]rune{currentTile.Char}), r.shadeColor(currentTile.FgColor, currentTile.Visibility))
+				r.engine.Text(i, j, string([]rune{currentTile.Char}), r.shadeColor(currentTile.FgColor, float64(currentTile.Visibility)))
 			} else {
 				// We have an object. First, draw its background (if it's not transparent).
 				// TODO: Perform this check *before* rendering the tile background to save a drawing call.
 				drawable := objects[objectMap[i][j]].GetComponent(components.DrawableName).(*components.Drawable)
-				r.engine.Rectangle(i, j, r.shadeColor(drawable.BgColor, currentTile.Visibility))
-				r.engine.Text(i, j, string([]rune{drawable.Char}), r.shadeColor(drawable.FgColor, currentTile.Visibility))
+				r.engine.Rectangle(i, j, r.shadeColor(drawable.BgColor, float64(currentTile.Visibility)))
+				r.engine.Text(i, j, string([]rune{drawable.Char}), r.shadeColor(drawable.FgColor, float64(currentTile.Visibility)))
 			}
 		}
 	}

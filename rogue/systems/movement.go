@@ -17,6 +17,10 @@ func NewMovementSystem() *MovementSystem {
 	return &MovementSystem{}
 }
 
+func (s *MovementSystem) Name() string {
+	return "movement"
+}
+
 func (s *MovementSystem) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.MovementName) && object.HasComponent(components.PositionName)
 }

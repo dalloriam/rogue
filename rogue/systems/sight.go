@@ -2,7 +2,6 @@ package systems
 
 import (
 	"math"
-	"time"
 
 	"github.com/dalloriam/rogue/rogue/structure"
 
@@ -18,14 +17,39 @@ const (
 	darkVisibility = 0.25
 )
 
+func makeCameraView(info UpdateInfo) components.CameraView {
+	cameraView := make([][]components.ViewInfo, info.WorldMap.SizeX())
+	for i := 0; i < info.WorldMap.SizeX(); i++ {
+		cameraView[i] = make([]components.ViewInfo, info.WorldMap.SizeY())
+		for j := 0; i < info.WorldMap.SizeY(); i++ {
+			cameraView[i][j] = components.ViewInfo{Tile: info.WorldMap[i][j]}
+		}
+	}
+	for _, obj := range info.ObjectsByID {
+		if !obj.HasComponent(components.PositionName) {
+			continue
+		}
+
+		position := obj.GetComponent(components.PositionName).(*components.Position)
+		objectsAtTile := []object.GameObject{}
+		for _, tileObjectID := range info.ObjectPositionMap[position.X()][position.Y()] {
+			objectsAtTile = append(objectsAtTile, info.ObjectsByID[tileObjectID])
+		}
+
+		cameraView[position.X()][position.Y()] = components.ViewInfo{Tile: *info.WorldMap.At(position), Entities: objectsAtTile}
+	}
+
+	return cameraView
+}
+
 type SightSystem struct {
 	RayCount int
 	RayStep  int
 
-	DefaultVisibility float64
+	DefaultVisibility cartography.TileVisibility
 }
 
-func NewSightSystem(defaultVisibility float64) *SightSystem {
+func NewSightSystem(defaultVisibility cartography.TileVisibility) *SightSystem {
 	return &SightSystem{
 		RayCount:          rayCount,
 		RayStep:           rayStep,
@@ -33,24 +57,42 @@ func NewSightSystem(defaultVisibility float64) *SightSystem {
 	}
 }
 
-// ShouldTrack returns whether this system should track the object.
-func (s *SightSystem) ShouldTrack(object object.GameObject) bool {
-	return object.HasComponent(components.CameraName) && object.HasComponent(components.PositionName)
+func (s *SightSystem) Name() string {
+	return "sight"
 }
 
-func (s *SightSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
+// ShouldTrack returns whether this system should track the object.
+func (s *SightSystem) ShouldTrack(object object.GameObject) bool {
+	return object.HasComponent(components.PositionName)
+}
+
+func (s *SightSystem) Update(info UpdateInfo) error {
 	// Make all tiles invisible.
-	for i := 0; i < len(worldMap); i++ {
-		for j := 0; j < len(worldMap[i]); j++ {
-			worldMap.At(structure.V(i, j)).Visibility = s.DefaultVisibility
+	for i := 0; i < len(info.WorldMap); i++ {
+		for j := 0; j < len(info.WorldMap[i]); j++ {
+			info.WorldMap.At(structure.V(i, j)).Visibility = s.DefaultVisibility
 		}
 	}
 
-	for _, obj := range objects {
+	for _, obj := range info.ObjectsByID {
 		pos := obj.GetComponent(components.PositionName).(*components.Position)
+
+		if !(obj.HasComponent(components.CameraName)) {
+			continue
+		}
+
 		cam := obj.GetComponent(components.CameraName).(*components.Camera)
 
-		worldMap.At(pos).Visibility = 1.0 // Camera always sees its own tile.
+		oldView := cam.View
+		if len(oldView) == 0 {
+			oldView = makeCameraView(info)
+		}
+		cam.View = makeCameraView(info)
+
+		cam.View.At(pos).Tile.Visibility = 1.0 // Camera always sees its own tile.
+		if cam.Main {
+			info.WorldMap.At(pos).Visibility = 1.0 // Camera always sees its own tile.
+		}
 
 		for i := 0; i < s.RayCount; i += s.RayStep {
 			// TODO: Precompute cos values.
@@ -64,29 +106,47 @@ func (s *SightSystem) Update(dT time.Duration, worldMap cartography.Map, objects
 				x += ax
 				y += ay
 
-				if x < 0 || y < 0 || int(x) >= worldMap.SizeX() || int(y) >= worldMap.SizeY() {
+				if x < 0 || y < 0 || int(x) >= info.WorldMap.SizeX() || int(y) >= info.WorldMap.SizeY() {
 					break
 				}
 
 				// If we reach here, tile {x, y} is visible.
-				tile := worldMap.At(structure.V(int(math.Round(x)), int(math.Round(y))))
-				tile.Visibility = 1.0
+				viewInfo := cam.View.At(structure.V(int(math.Round(x)), int(math.Round(y))))
+				viewInfo.Tile.Visibility = 1.0
 
-				cam.Memory = append(cam.Memory, tile.Position)
+				if cam.Main {
+					info.WorldMap.At(structure.V(int(math.Round(x)), int(math.Round(y)))).Visibility = 1.0
+				}
 
 				// However, if the current tile blocks sight, stop raytracing.
-				if cam.BlockedBy.Contains(tile.Type) {
+				if cam.BlockedBy.Contains(viewInfo.Tile.Type) {
 					break
 				}
 			}
 		}
 
-		// Override tile memory
-		for _, tileVec := range cam.Memory {
-			if t := worldMap.At(tileVec); t.Visibility == 0.0 {
-				t.Visibility = darkVisibility
+		for i := 0; i < info.WorldMap.SizeX(); i++ {
+			for j := 0; j < info.WorldMap.SizeY(); j++ {
+				oldViewInfo := oldView.At(structure.V(i, j))
+				newViewInfo := cam.View.At(structure.V(i, j))
+				if newViewInfo.Tile.Visibility == 0 && oldViewInfo.Tile.Visibility > 0 {
+					if cam.Main {
+						info.WorldMap[i][j].Visibility = cartography.VisibilityOutOfSight
+					}
+					newViewInfo.Tile.Visibility = cartography.VisibilityOutOfSight
+				}
 			}
 		}
+
 	}
+
+	// Update observed object position only if object tile is visible.
+	for _, nonCamObject := range info.ObjectsByID {
+		objectPosition := nonCamObject.GetComponent(components.PositionName).(*components.Position)
+		if info.WorldMap.At(objectPosition.Vec).Visibility == 1.0 {
+			nonCamObject.AddComponents(&components.ObservedPosition{Vec: structure.V(objectPosition.X(), objectPosition.Y())})
+		}
+	}
+
 	return nil
 }

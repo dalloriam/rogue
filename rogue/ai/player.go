@@ -58,8 +58,12 @@ func (pc *PlayerController) getPlayerInputAction(tgtObj object.GameObject) func(
 }
 
 // GetAction returns the action performed by this entity.
-func (pc *PlayerController) GetAction(obj object.GameObject, worldMap cartography.Map) func() {
+func (pc *PlayerController) GetAction(obj object.GameObject) func() {
 	playerInputAction := pc.getPlayerInputAction(obj)
+
+	if !obj.HasComponent(components.InitiativeName) {
+		return nil
+	}
 
 	switch pc.state {
 	case defaultState:
@@ -75,7 +79,12 @@ func (pc *PlayerController) GetAction(obj object.GameObject, worldMap cartograph
 		}
 	case repeatMode:
 		if playerInputAction == nil {
-			return func() { pc.repeatedAction(obj) }
+			return func() {
+				if act := pc.getPlayerInputAction(obj); act != nil {
+					obj.AddComponents(&components.Control{Agent: pc})
+				}
+				pc.repeatedAction(obj)
+			}
 		} else {
 			pc.state = defaultState
 		}

@@ -34,6 +34,7 @@ func Player(x, y int, handler *roguepixel.InputHandler) object.GameObject {
 		&components.Camera{
 			SightRadius: 8,
 			BlockedBy:   stringset.FromValues([]string{"wall"}),
+			Main:        true,
 		},
 		&components.Player{},
 	)
