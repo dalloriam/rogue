@@ -30,6 +30,5 @@ func NPC(x, y int) object.GameObject {
 			BlockedBy:   stringset.FromValues([]string{"wall"}),
 		},
 		&components.Control{Agent: ai.NewNPCController()},
-		&components.Player{},
 	)
 }

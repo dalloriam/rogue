@@ -29,10 +29,6 @@ func (c *ActionSystem) ShouldTrack(object object.GameObject) bool {
 }
 
 func (c *ActionSystem) Update(info UpdateInfo) error {
-	if time.Since(c.timeOfLastTurn) < minTurnDelta {
-		// No action -- not enough time.
-		return nil
-	}
 
 	actions := []func(){}
 
@@ -53,6 +49,10 @@ func (c *ActionSystem) Update(info UpdateInfo) error {
 		}
 	}
 
+	if time.Since(c.timeOfLastTurn) < minTurnDelta {
+		// No action -- not enough time.
+		return nil
+	}
 	c.timeOfLastTurn = time.Now()
 
 	for _, action := range actions {

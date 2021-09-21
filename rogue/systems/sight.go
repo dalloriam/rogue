@@ -32,6 +32,12 @@ func makeCameraView(info UpdateInfo) components.CameraView {
 		}
 
 		position := obj.GetComponent(components.PositionName).(*components.Position)
+
+		// This camera can't see this tile, so we don't register the entities on it in its view.
+		if info.WorldMap.At(position).Visibility != 1.0 {
+			continue
+		}
+
 		objectsAtTile := []object.GameObject{}
 		for _, tileObjectID := range info.ObjectPositionMap[position.X()][position.Y()] {
 			objectsAtTile = append(objectsAtTile, info.ObjectsByID[tileObjectID])

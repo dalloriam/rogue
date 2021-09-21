@@ -1,6 +1,7 @@
 package rogue
 
 import (
+	"fmt"
 	"sort"
 	"time"
 
@@ -43,6 +44,7 @@ func (w *World) LoadMap(m cartography.Map) {
 func (w *World) AddObject(object object.GameObject) {
 	// Add the object to the main registry.
 	w.objects[object.ID()] = object
+	fmt.Println("Adding object: ", object.ID())
 }
 
 func (w *World) AddSystem(sys systems.System, priority int) {

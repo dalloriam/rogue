@@ -80,9 +80,6 @@ func (pc *PlayerController) GetAction(obj object.GameObject) func() {
 	case repeatMode:
 		if playerInputAction == nil {
 			return func() {
-				if act := pc.getPlayerInputAction(obj); act != nil {
-					obj.AddComponents(&components.Control{Agent: pc})
-				}
 				pc.repeatedAction(obj)
 			}
 		} else {

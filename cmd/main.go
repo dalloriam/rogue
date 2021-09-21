@@ -43,7 +43,7 @@ func pixelRun() {
 		TileHeight: 25,
 		TileWidth:  25,
 
-		WindowTitle: "Rogue Demo",
+		WindowTitle: "GoRogue",
 		WindowSizeX: 1300,
 		WindowSizeY: 900,
 
