@@ -19,7 +19,7 @@ type UpdateInfo struct {
 type System interface {
 	Name() string
 	ShouldTrack(object object.GameObject) bool
-	Update(UpdateInfo) error
+	Update(info UpdateInfo) error
 }
 
 // GameSystem wraps an abstract system in a well-composed system object.

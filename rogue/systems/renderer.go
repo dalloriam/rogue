@@ -3,9 +3,7 @@ package systems
 import (
 	"image/color"
 	"math"
-	"time"
 
-	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/object"
 )
@@ -64,7 +62,7 @@ func (r *Renderer) shadeColor(c color.Color, shadePercent float64) color.Color {
 }
 
 // Update updates the system state.
-func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
+func (r *Renderer) Update(info UpdateInfo) error {
 
 	// TODO: Get rid of this.
 	// Phase 0 - Clear previous frame.
@@ -73,19 +71,19 @@ func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects ma
 	// - Phase 1 -
 	// Create an object positional map. This will help us drawing the map
 	// by allowing us to perform drawable object lookups by position in O(1).
-	objectMap := make([][]uint64, worldMap.SizeX())
-	for i := 0; i < worldMap.SizeX(); i++ {
-		objectMap[i] = make([]uint64, worldMap.SizeY())
+	objectMap := make([][]uint64, info.WorldMap.SizeX())
+	for i := 0; i < info.WorldMap.SizeX(); i++ {
+		objectMap[i] = make([]uint64, info.WorldMap.SizeY())
 	}
-	for _, obj := range objects {
+	for _, obj := range info.ObjectsByID {
 		position := obj.GetComponent(components.ObservedPositionName).(*components.ObservedPosition)
 		objectMap[position.X()][position.Y()] = obj.ID()
 	}
 
 	// Phase 1 - Draw cartography changes (TODO: Take viewport into account?)
-	for i := 0; i < len(worldMap); i++ {
-		for j := 0; j < len(worldMap[i]); j++ {
-			currentTile := worldMap[i][j]
+	for i := 0; i < info.WorldMap.SizeX(); i++ {
+		for j := 0; j < info.WorldMap.SizeY(); j++ {
+			currentTile := info.WorldMap[i][j]
 			if currentTile.Visibility == 0.0 {
 				continue
 			}
@@ -102,7 +100,7 @@ func (r *Renderer) Update(dT time.Duration, worldMap cartography.Map, objects ma
 			} else {
 				// We have an object. First, draw its background (if it's not transparent).
 				// TODO: Perform this check *before* rendering the tile background to save a drawing call.
-				drawable := objects[objectMap[i][j]].GetComponent(components.DrawableName).(*components.Drawable)
+				drawable := info.ObjectsByID[objectMap[i][j]].GetComponent(components.DrawableName).(*components.Drawable)
 				r.engine.Rectangle(i, j, r.shadeColor(drawable.BgColor, float64(currentTile.Visibility)))
 				r.engine.Text(i, j, string([]rune{drawable.Char}), r.shadeColor(drawable.FgColor, float64(currentTile.Visibility)))
 			}

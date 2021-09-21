@@ -1,11 +1,8 @@
 package systems
 
 import (
-	"time"
-
 	"github.com/dalloriam/rogue/rogue/components"
 
-	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/object"
 )
 
@@ -25,8 +22,8 @@ func (s *InitiativeSystem) ShouldTrack(obj object.GameObject) bool {
 	return obj.HasComponent(components.ControlName)
 }
 
-func (s *InitiativeSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
-	for _, obj := range objects {
+func (s *InitiativeSystem) Update(info UpdateInfo) error {
+	for _, obj := range info.ObjectsByID {
 		if obj.HasComponent(components.InitiativeName) {
 			continue
 		}

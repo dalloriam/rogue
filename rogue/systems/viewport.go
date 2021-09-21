@@ -1,11 +1,8 @@
 package systems
 
 import (
-	"time"
-
 	"github.com/dalloriam/rogue/rogue/structure"
 
-	"github.com/dalloriam/rogue/rogue/cartography"
 	"github.com/dalloriam/rogue/rogue/components"
 	"github.com/dalloriam/rogue/rogue/object"
 )
@@ -31,13 +28,13 @@ func (c *ViewportSystem) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.FocusName) && object.HasComponent(components.PositionName)
 }
 
-func (c *ViewportSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
+func (c *ViewportSystem) Update(info UpdateInfo) error {
 	var bestPos structure.Vec
 	highestPriority := -1
 	punctual := false
 	var bestObject object.GameObject
 
-	for _, obj := range objects {
+	for _, obj := range info.ObjectsByID {
 		focusTgt := obj.GetComponent(components.FocusName).(*components.Focus)
 		position := obj.GetComponent(components.PositionName).(*components.Position)
 

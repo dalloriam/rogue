@@ -1,8 +1,6 @@
 package systems
 
 import (
-	"time"
-
 	"github.com/dalloriam/rogue/rogue/structure"
 
 	"github.com/dalloriam/rogue/rogue/cartography"
@@ -25,8 +23,8 @@ func (s *MovementSystem) ShouldTrack(object object.GameObject) bool {
 	return object.HasComponent(components.MovementName) && object.HasComponent(components.PositionName)
 }
 
-func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, objects map[uint64]object.GameObject) error {
-	for _, obj := range objects {
+func (s *MovementSystem) Update(info UpdateInfo) error {
+	for _, obj := range info.ObjectsByID {
 		movement := obj.GetComponent(components.MovementName).(*components.Movement)
 		position := obj.GetComponent(components.PositionName).(*components.Position)
 
@@ -58,7 +56,7 @@ func (s *MovementSystem) Update(dT time.Duration, worldMap cartography.Map, obje
 		// Check if the movement is blocked before triggering.
 		if obj.HasComponent(components.PhysicsName) {
 			phys := obj.GetComponent(components.PhysicsName).(*components.Physics)
-			tgtTile := worldMap.At(newPosition)
+			tgtTile := info.WorldMap.At(newPosition)
 
 			if !phys.BlockedBy.Contains(tgtTile.Type) {
 				obj.AddComponents(&newPosition)

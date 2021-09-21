@@ -21,8 +21,9 @@ func makeCameraView(info UpdateInfo) components.CameraView {
 	cameraView := make([][]components.ViewInfo, info.WorldMap.SizeX())
 	for i := 0; i < info.WorldMap.SizeX(); i++ {
 		cameraView[i] = make([]components.ViewInfo, info.WorldMap.SizeY())
-		for j := 0; i < info.WorldMap.SizeY(); i++ {
-			cameraView[i][j] = components.ViewInfo{Tile: info.WorldMap[i][j]}
+		for j := 0; j < info.WorldMap.SizeY(); j++ {
+			myViewInfo := components.ViewInfo{Tile: info.WorldMap[i][j]}
+			cameraView[i][j] = myViewInfo
 		}
 	}
 	for _, obj := range info.ObjectsByID {
@@ -140,7 +141,7 @@ func (s *SightSystem) Update(info UpdateInfo) error {
 
 	}
 
-	// Update observed object position only if object tile is visible.
+	// Update observed object position only if object tile is visible by the main camera.
 	for _, nonCamObject := range info.ObjectsByID {
 		objectPosition := nonCamObject.GetComponent(components.PositionName).(*components.Position)
 		if info.WorldMap.At(objectPosition.Vec).Visibility == 1.0 {
